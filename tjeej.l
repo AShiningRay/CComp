@@ -41,7 +41,6 @@ unary "++"|"--"
 "-"                         { return SUBTRACT; }
 "/"                         { return DIVIDE; }
 "*"                         { return MULTIPLY; }
-.	                    	{ return *yytext; }
 ["].*["]                    { return STR; }
 ['].[']                     { return CHARACTER; }
 [-]?{digit}+\.{digit}{1,9}  { return FLOAT_NUM; }
@@ -50,7 +49,7 @@ unary "++"|"--"
 \/\/.*                      { ; }
 \/\*(.*\n)*.*\*\/           { ; } 
 [ \t]*                      { ; }
-
+.	                    	{ return printf("Unrecognized token: %s\n", yytext); }
 
 %%
 

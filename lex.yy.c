@@ -381,18 +381,18 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[115] =
     {   0,
-       36,   36,   38,   28,   28,   33,   28,   28,   28,   28,
-       27,   24,   25,   26,   15,   21,   28,   20,   14,   14,
-       14,   14,   14,   14,   14,   14,   14,   14,   28,   28,
-       36,   19,    0,   29,   22,    0,   32,   15,    0,   34,
+       35,   35,   38,   36,   35,   32,   36,   36,   36,   36,
+       27,   24,   25,   26,   15,   21,   36,   20,   14,   14,
+       14,   14,   14,   14,   14,   14,   14,   14,   36,   36,
+       35,   19,    0,   28,   22,    0,   31,   15,    0,   33,
         0,   16,   18,   17,   14,   14,   14,   14,   14,   14,
-        9,   14,   14,   14,   14,   14,   14,   23,    0,   30,
-        0,    0,    0,   34,   31,   14,   14,   14,   14,    8,
-        3,   14,   14,   14,   14,   14,    0,   35,   31,    5,
-       10,   14,   14,   14,   14,   14,   12,    6,    0,   31,
-       13,    4,   14,   14,    2,    0,   31,    1,    7,    0,
+        9,   14,   14,   14,   14,   14,   14,   23,    0,   29,
+        0,    0,    0,   33,   30,   14,   14,   14,   14,    8,
+        3,   14,   14,   14,   14,   14,    0,   34,   30,    5,
+       10,   14,   14,   14,   14,   14,   12,    6,    0,   30,
+       13,    4,   14,   14,    2,    0,   30,    1,    7,    0,
 
-       31,    0,   31,    0,   31,    0,    0,   31,    0,   31,
+       30,    0,   30,    0,   30,    0,    0,   30,    0,   30,
         0,    0,   11,    0
     } ;
 
@@ -522,7 +522,7 @@ static const flex_int16_t yy_chk[187] =
 static const flex_int32_t yy_rule_can_match_eol[38] =
     {   0,
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0,     };
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -975,53 +975,53 @@ YY_RULE_SETUP
 case 28:
 YY_RULE_SETUP
 #line 44 "tjeej.l"
-{ return *yytext; }
+{ return STR; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 45 "tjeej.l"
-{ return STR; }
+{ return CHARACTER; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 46 "tjeej.l"
-{ return CHARACTER; }
+{ return FLOAT_NUM; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 47 "tjeej.l"
-{ return FLOAT_NUM; }
-	YY_BREAK
-case 32:
-YY_RULE_SETUP
-#line 48 "tjeej.l"
 { return UNARY; }
 	YY_BREAK
-case 33:
-/* rule 33 can match eol */
+case 32:
+/* rule 32 can match eol */
 YY_RULE_SETUP
-#line 49 "tjeej.l"
+#line 48 "tjeej.l"
 { linecount++; }
 	YY_BREAK
-case 34:
+case 33:
 YY_RULE_SETUP
-#line 50 "tjeej.l"
+#line 49 "tjeej.l"
 { ; }
 	YY_BREAK
+case 34:
+/* rule 34 can match eol */
+YY_RULE_SETUP
+#line 50 "tjeej.l"
+{ ; } 
+	YY_BREAK
 case 35:
-/* rule 35 can match eol */
 YY_RULE_SETUP
 #line 51 "tjeej.l"
-{ ; } 
+{ ; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
 #line 52 "tjeej.l"
-{ ; }
+{ return printf("Unrecognized token: %s\n", yytext); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 55 "tjeej.l"
+#line 54 "tjeej.l"
 ECHO;
 	YY_BREAK
 #line 1027 "lex.yy.c"
@@ -2043,7 +2043,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 55 "tjeej.l"
+#line 54 "tjeej.l"
 
 
 /* Scanner subroutines, only has yywrap for now, returning 1 
