@@ -44,8 +44,9 @@ unary "++"|"--"
 .	                    	{ return *yytext; }
 ["].*["]                    { return STR; }
 ['].[']                     { return CHARACTER; }
-[\n]                        { linecount++; }
+[-]?{digit}+\.{digit}{1,9}  { return FLOAT_NUM; }
 {unary}                     { return UNARY; }
+[\n]                        { linecount++; }
 
 
 %%
