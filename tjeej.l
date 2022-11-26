@@ -47,6 +47,9 @@ unary "++"|"--"
 [-]?{digit}+\.{digit}{1,9}  { return FLOAT_NUM; }
 {unary}                     { return UNARY; }
 [\n]                        { linecount++; }
+\/\/.*                      { ; }
+\/\*(.*\n)*.*\*\/           { ; } 
+[ \t]*                      { ; }
 
 
 %%
