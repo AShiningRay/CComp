@@ -29,10 +29,24 @@ unary "++"|"--"
 "false"                     { return FALSE; }
 {letter}({letter}|{digit})* { return ID; }
 [-]?{digit}+                { return NUMBER; }
+"<="                        { return LE; }
+">="                        { return GE; }
+"=="                        { return EQ; }
+"!="                        { return NE; }
+">"	                    	{ return GT; }
+"<"	                    	{ return LT; }
+"&&"	                    { return AND; }
+"||"	                    { return OR; }
+"+"                         { return ADD; }
+"-"                         { return SUBTRACT; }
+"/"                         { return DIVIDE; }
+"*"                         { return MULTIPLY; }
 .	                    	{ return *yytext; }
 ["].*["]                    { return STR; }
 ['].[']                     { return CHARACTER; }
 [\n]                        { linecount++; }
+{unary}                     { return UNARY; }
+
 
 %%
 
