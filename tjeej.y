@@ -144,19 +144,28 @@ int main()
 
     yyparse();
 
-    printf("\nSCANNER'S TOKEN MATCHING RESULTS:");
-    printf("\n\nGENERATED SYMBOL TABLE:");
-    printf("\nSYMBOL |  DATATYPE | TYPE ON TBL | LINE NUM \n");
-    printf("|______________________________________________|\n\n");
-    
-    for(i=0; i<symbolnum; i++) { printf("%s\t| %s\t| %s\t| %d\t\n", symbol_table[i].id, symbol_table[i].datatype, symbol_table[i].type_to_symtab, symbol_table[i].line_num); }
-
-    for(i=0;i<symbolnum;i++)
+    if(errorcount == 0)
     {
-        free(symbol_table[i].id);
-        free(symbol_table[i].type_to_symtab);
+        printf("SCANNER'S TOKEN MATCHING RESULTS:");
+        printf("\n\nGENERATED SYMBOL TABLE:");
+        printf("\nSYMBOL |  DATATYPE | TYPE ON TBL | LINE NUM \n");
+        printf("|______________________________________________|\n\n");
+        
+        for(i=0; i<symbolnum; i++) { printf("%s\t| %s\t| %s\t| %d\t\n", symbol_table[i].id, symbol_table[i].datatype, symbol_table[i].type_to_symtab, symbol_table[i].line_num); }
+
+        for(i=0;i<symbolnum;i++)
+        {
+            free(symbol_table[i].id);
+            free(symbol_table[i].type_to_symtab);
+        }
+        printf("\n\n");
+
+        printf("Program parsed successfully with no syntax errors!\n");
     }
-    printf("\n\n");
+    else
+    {
+        printf("\nError parsing the program...\n");
+    }
 }
 
 void yyerror(const char* msg)
