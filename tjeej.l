@@ -1,6 +1,6 @@
 /* TurboJeeJio C Scanner */
 %{
-    #include "y.tab.h"
+    #include "tjeej.tab.h"
     int linecount=0; /* Stores the line number for debugging */
 %}
 

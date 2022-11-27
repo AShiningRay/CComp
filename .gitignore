@@ -4,9 +4,9 @@
 # Compiler intermediate files
 a.out
 lex.yy.c
-y.output
-y.tab.c
-y.tab.h
+tjeej.output
+tjeej.tab.c
+tjeej.tab.h
 
 # Object files
 *.o
