@@ -4,6 +4,6 @@ TurboJeeJio - A simple C Compiler using LEX and YACC
 
 ## Building the compiler
 
-To build the compiler, use the following commands:
+To build the compiler, just execute `./build_tjeej.sh` and it will build TurboJeejio as long as you have bison and lex installed.
 
-` yacc -v -d tjeej.y && lex tjeej.l && gcc y.tab.c && ./a.out<test_sources/testnum.c `
+To test the compiler on the C sources provided by this repository, run `./a.out<test_sources/testfile.c`.
