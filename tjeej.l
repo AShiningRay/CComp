@@ -2,6 +2,7 @@
 %{
     #include "tjeej.tab.h"
     int linecount=0; /* Stores the line number for debugging */
+    extern int yycolno;
 %}
 
 /* yylineno creates a scanner that keeps track of the line number */
@@ -45,11 +46,11 @@ unary "++"|"--"
 [-]?{digit}+\.{digit}{1,9}  { return FLOAT_NUM; }
 \/\/.*                      { ; }
 \/\*(.*\n)*.*\*\/           { ; } 
-[ \t]*                      { ; }
-[\n]                        { linecount++; }
+[ \t]*                      { yycolno += 4; }
+[\n]                        { linecount++; yycolno = 1; }
 ["].*["]                    { return STR; }
 ['].[']                     { return CHARACTER; }
-.	                    	{ return *yytext; }
+.	                    	{ yycolno++; return *yytext; }
 
 %%
 

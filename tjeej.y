@@ -5,7 +5,7 @@
     #include <stdlib.h>
     #include "lex.yy.c"
 
-    int errorcount = 0, yylineno, symbolnum = 0, symbolposfound;
+    int errorcount = 0, yylineno, yycolno, symbolnum = 0, symbolposfound;
     extern int linecount;
     char symboltype[10];
 
@@ -171,7 +171,7 @@ int main()
 void yyerror(const char* msg)
 {
     errorcount++;
-    printf ("Parse error at line %d: %s\n", yylineno, msg);
+    printf ("Parse error at line %d, column %d: %s\n", yylineno, yycolno, msg);
 }
 
 
