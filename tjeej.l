@@ -10,7 +10,7 @@
 
 letter [a-zA-Z]
 digit  [0-9]
-unary "++"|"--"
+unary  "++"|"--"
 
 /* Scanner ruleset */
 %%
@@ -18,6 +18,7 @@ unary "++"|"--"
 "printf"                            { return PRINTF; }
 "scanf"                             { return SCANF; }
 "int"                               { return INT; }
+"bool"                              { return BOOL; }
 "float"                             { return FLOAT; }
 "char"                              { return CHAR; }
 "void"                              { return VOID; }

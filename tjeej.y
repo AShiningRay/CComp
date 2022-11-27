@@ -26,9 +26,9 @@
 %}
 
 /* Tokens currently supported by the scanner */
-%token VOID CHARACTER PRINTF SCANF INT FLOAT CHAR FOR IF ELSE 
-TRUE FALSE NUMBER FLOAT_NUM ID LE GE EQ NE GT LT AND OR STR 
-ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN
+%token VOID CHARACTER PRINTF SCANF INT BOOL FLOAT CHAR FOR IF 
+ELSE TRUE FALSE NUMBER FLOAT_NUM ID LE GE EQ NE GT LT AND OR 
+STR ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN
 
 
 /* Grammar definitions for the language */
@@ -45,8 +45,9 @@ ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN
     | INCLUDE { add_symbol('H'); }
     ;
 
-    /* The currently supported datatypes are int, float, char and void */
+    /* The currently supported datatypes are int, bool, float, char and void */
     datatype: INT { insert_type_on_table(); }
+    | BOOL    { insert_type_on_table(); }
     | FLOAT   { insert_type_on_table(); }
     | CHAR    { insert_type_on_table(); }
     | VOID    { insert_type_on_table(); }
@@ -78,6 +79,7 @@ ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN
     /* A condition expresses the result of a relational operator between
     two values, and can return either true or false */
     cond: value relop value 
+    | cond logop cond
     | TRUE  { add_symbol('K'); }
     | FALSE { add_symbol('K'); }
     ;
@@ -108,6 +110,10 @@ ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN
     | GE
     | EQ
     | NE
+    ;
+
+    logop: AND
+    | OR
     ;
 
     /* In C, we don't actually need to initialize a variable when 
