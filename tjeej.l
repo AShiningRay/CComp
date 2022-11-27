@@ -59,6 +59,7 @@ unary  "++"|"--"
 "]"                                 { return RBRACE; }
 "="                                 { return ATTRIB; }
 ";"                                 { return STMTEND; }
+","                                 { return COMMA; }
 .	                    	        { return printf("Unrecognized token at line %d, column %d: '%s'\n", yylineno, yycolno, yytext); }
 
 %%

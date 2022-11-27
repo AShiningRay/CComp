@@ -29,7 +29,7 @@
 %token VOID CHARACTER PRINTF SCANF INT BOOL FLOAT CHAR FOR IF 
 ELSE TRUE FALSE NUMBER FLOAT_NUM ID LE GE EQ NE GT LT AND OR 
 STR ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN LPAR 
-RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND
+RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND COMMA
 
 
 /* Grammar definitions for the language */
@@ -65,16 +65,20 @@ RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND
     | stmt STMTEND 
     | body body
     | PRINTF { add_symbol('K'); } LPAR STR RPAR STMTEND
-    | SCANF  { add_symbol('K'); } LPAR STR ',' '&' ID RPAR STMTEND
+    | SCANF  { add_symbol('K'); } LPAR STR COMMA '&' ID RPAR STMTEND
     ;
 
     /* A statement can be a datatype initialization, an attribution to an 
-    identifier, a relationa operation between identifier and expression, etc. */
-    stmt: datatype ID { add_symbol('V'); } init 
+    identifier, a relational operation between identifier and expression, etc. */
+    stmt: datatype var_decl;
     | ID ATTRIB expr 
     | ID relop expr
     | ID UNARY 
     | UNARY ID
+    ;
+
+    var_decl: ID { add_symbol('V'); } init 
+    | var_decl COMMA var_decl
     ;
 
     /* A condition expresses the result of a relational operator between
