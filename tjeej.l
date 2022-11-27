@@ -12,7 +12,7 @@ letter [a-zA-Z]
 digit  [0-9]
 unary  "++"|"--"
 
-/* Scanner ruleset */
+/* Scanner ruleset, last rule is reserved for unrecognized tokens */
 %%
 
 "printf"                            { return PRINTF; }
@@ -51,11 +51,18 @@ unary  "++"|"--"
 [\n]                                { linecount++; yycolno = 1; }
 ["].*["]                            { return STR; }
 ['].[']                             { return CHARACTER; }
-.	                    	        { return *yytext; }
+"("                                 { return LPAR; }
+")"                                 { return RPAR; }
+"{"                                 { return LBRACK; }
+"}"                                 { return RBRACK; }
+"["                                 { return LBRACE; }
+"]"                                 { return RBRACE; }
+"="                                 { return ATTRIB; }
+";"                                 { return STMTEND; }
+.	                    	        { return printf("Unrecognized token at line %d, column %d: '%s'\n", yylineno, yycolno, yytext); }
 
 %%
 
-/* .	                    	{ return printf("Unrecognized token: '%s' at line '%d'\n", yytext, linecount); } */
 
 /* Scanner subroutines, only has yywrap for now, returning 1 
 whenever the scanner has finished scanning a source file. */

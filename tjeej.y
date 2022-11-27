@@ -28,7 +28,8 @@
 /* Tokens currently supported by the scanner */
 %token VOID CHARACTER PRINTF SCANF INT BOOL FLOAT CHAR FOR IF 
 ELSE TRUE FALSE NUMBER FLOAT_NUM ID LE GE EQ NE GT LT AND OR 
-STR ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN
+STR ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN LPAR 
+RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND
 
 
 /* Grammar definitions for the language */
@@ -36,7 +37,7 @@ STR ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN
 
     /* Defines the overall C program structure, usually composed of 
     headers, the main function and its body, then the return statement */
-    prog: headers main '(' ')' '{' body return '}'
+    prog: headers main LPAR RPAR LBRACK body return RBRACK
     ;
 
     /* Defines the way by which includes are parsed. having two 'headers'
@@ -59,18 +60,18 @@ STR ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN
 
     /* For the body, we have a set of rules of tokens, statements, loops
     and conditionals that allows us to create a slew of different programs*/
-    body: FOR { add_symbol('K'); } '(' stmt ';' cond ';' stmt ')' '{' body '}'
-    | IF { add_symbol('K'); } '(' cond ')' '{' body '}' else
-    | stmt ';' 
+    body: FOR { add_symbol('K'); } LPAR stmt STMTEND cond STMTEND stmt RPAR LBRACK body RBRACK
+    | IF { add_symbol('K'); } LPAR cond RPAR LBRACK body RBRACK else
+    | stmt STMTEND 
     | body body
-    | PRINTF { add_symbol('K'); } '(' STR ')' ';'
-    | SCANF  { add_symbol('K'); } '(' STR ',' '&' ID ')' ';'
+    | PRINTF { add_symbol('K'); } LPAR STR RPAR STMTEND
+    | SCANF  { add_symbol('K'); } LPAR STR ',' '&' ID RPAR STMTEND
     ;
 
     /* A statement can be a datatype initialization, an attribution to an 
     identifier, a relationa operation between identifier and expression, etc. */
     stmt: datatype ID { add_symbol('V'); } init 
-    | ID '=' expr 
+    | ID ATTRIB expr 
     | ID relop expr
     | ID UNARY 
     | UNARY ID
@@ -86,11 +87,11 @@ STR ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN
 
     /* This production is a continuation of the IF ... else rule in the "body:"
     definition above, and allows for the use of if-else as well as a single if. */
-    else: ELSE { add_symbol('K'); } '{' body '}'
+    else: ELSE { add_symbol('K'); } LBRACK body RBRACK
     |
     ;
 
-    /* Values can be a number, a float, a character and an identifier */
+    /* Values can be a number, a float, a character and an sidentifier */
     value: NUMBER { add_symbol('C'); }
     | FLOAT_NUM   { add_symbol('C'); }
     | CHARACTER   { add_symbol('C'); }
@@ -118,7 +119,7 @@ STR ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN
 
     /* In C, we don't actually need to initialize a variable when 
     declaring it, so the init definition can be produced into null */
-    init: '=' value 
+    init: ATTRIB value 
     |
     ;
 
@@ -139,7 +140,7 @@ STR ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN
     /* Return is yet another definition that can be produced into null
     since we don't need to explicitly issue a return command in C's 
     functions all the time. */
-    return: RETURN { add_symbol('K'); } value ';' 
+    return: RETURN { add_symbol('K'); } value STMTEND 
     |
     ;
 
