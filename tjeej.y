@@ -72,7 +72,8 @@ ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN
     | ID '=' expr 
     | ID relop expr
     | ID UNARY 
-    | UNARY ID;
+    | UNARY ID
+    ;
 
     /* A condition expresses the result of a relational operator between
     two values, and can return either true or false */

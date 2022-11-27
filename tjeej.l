@@ -15,42 +15,42 @@ unary "++"|"--"
 /* Scanner ruleset */
 %%
 
-"printf"                    { return PRINTF; }
-"scanf"                     { return SCANF; }
-"int"                       { return INT; }
-"float"                     { return FLOAT; }
-"char"                      { return CHAR; }
-"void"                      { return VOID; }
-"return"                    { return RETURN; }
-"for"	                    { return FOR; }
-"if"	                    { return IF; }
-"else"	                    { return ELSE; }
-^"#include"[ ]*<.+\.h>      { return INCLUDE; }
-"true"                      { return TRUE; }
-"false"                     { return FALSE; }
-{letter}({letter}|{digit})* { return ID; }
-[-]?{digit}+                { return NUMBER; }
-{unary}                     { return UNARY; }
-"<="                        { return LE; }
-">="                        { return GE; }
-"=="                        { return EQ; }
-"!="                        { return NE; }
-">"	                    	{ return GT; }
-"<"	                    	{ return LT; }
-"&&"	                    { return AND; }
-"||"	                    { return OR; }
-"+"                         { return ADD; }
-"-"                         { return SUBTRACT; }
-"/"                         { return DIVIDE; }
-"*"                         { return MULTIPLY; }
-[-]?{digit}+\.{digit}{1,9}  { return FLOAT_NUM; }
-\/\/.*                      { ; }
-\/\*(.*\n)*.*\*\/           { ; } 
-[ \t]*                      { yycolno += 4; }
-[\n]                        { linecount++; yycolno = 1; }
-["].*["]                    { return STR; }
-['].[']                     { return CHARACTER; }
-.	                    	{ yycolno++; return *yytext; }
+"printf"                            { return PRINTF; }
+"scanf"                             { return SCANF; }
+"int"                               { return INT; }
+"float"                             { return FLOAT; }
+"char"                              { return CHAR; }
+"void"                              { return VOID; }
+"return"                            { return RETURN; }
+"for"	                            { return FOR; }
+"if"	                            { return IF; }
+"else"	                            { return ELSE; }
+^"#include"[ ]*<.+\.h>              { return INCLUDE; }
+"true"                              { return TRUE; }
+"false"                             { return FALSE; }
+(_|{letter})({letter}|{digit}|_)*   { return ID; }
+[-]?{digit}+                        { return NUMBER; }
+{unary}                             { return UNARY; }
+"<="                                { return LE; }
+">="                                { return GE; }
+"=="                                { return EQ; }
+"!="                                { return NE; }
+">"	                    	        { return GT; }
+"<"	                    	        { return LT; }
+"&&"	                            { return AND; }
+"||"	                            { return OR; }
+"+"                                 { return ADD; }
+"-"                                 { return SUBTRACT; }
+"/"                                 { return DIVIDE; }
+"*"                                 { return MULTIPLY; }
+[-]?{digit}+\.{digit}{1,9}          { return FLOAT_NUM; }
+\/\/.*                              { ; }
+\/\*(.*\n)*.*\*\/                   { ; } 
+[ \t]*                              { yycolno += 4; }
+[\n]                                { linecount++; yycolno = 1; }
+["].*["]                            { return STR; }
+['].[']                             { return CHARACTER; }
+.	                    	        { return *yytext; }
 
 %%
 
