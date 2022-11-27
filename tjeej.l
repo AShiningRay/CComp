@@ -57,6 +57,7 @@ unary "++"|"--"
 
 /* Scanner subroutines, only has yywrap for now, returning 1 
 whenever the scanner has finished scanning a source file. */
-int yywrap() {
+int yywrap()
+{
     return 1;
 }
