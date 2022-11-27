@@ -1,5 +1,5 @@
 # TurboJeeJio
-TurboJeeJio - A simple C Compiler using LEX and YACC
+TurboJeeJio - A simple C Compiler using Lex and Bison
 
 
 ## Building the compiler
