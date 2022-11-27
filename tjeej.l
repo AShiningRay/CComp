@@ -1,6 +1,6 @@
 /* TurboJeeJio C Scanner */
 %{
-    #include "tjeej.tab.h"
+    #include "y.tab.h"
     int linecount=0; /* Stores the line number for debugging */
 %}
 
@@ -29,6 +29,7 @@ unary "++"|"--"
 "false"                     { return FALSE; }
 {letter}({letter}|{digit})* { return ID; }
 [-]?{digit}+                { return NUMBER; }
+{unary}                     { return UNARY; }
 "<="                        { return LE; }
 ">="                        { return GE; }
 "=="                        { return EQ; }
@@ -41,17 +42,18 @@ unary "++"|"--"
 "-"                         { return SUBTRACT; }
 "/"                         { return DIVIDE; }
 "*"                         { return MULTIPLY; }
-["].*["]                    { return STR; }
-['].[']                     { return CHARACTER; }
 [-]?{digit}+\.{digit}{1,9}  { return FLOAT_NUM; }
-{unary}                     { return UNARY; }
-[\n]                        { linecount++; }
 \/\/.*                      { ; }
 \/\*(.*\n)*.*\*\/           { ; } 
 [ \t]*                      { ; }
-.	                    	{ return printf("Unrecognized token: %s\n", yytext); }
+[\n]                        { linecount++; }
+["].*["]                    { return STR; }
+['].[']                     { return CHARACTER; }
+.	                    	{ return *yytext; }
 
 %%
+
+/* .	                    	{ return printf("Unrecognized token: '%s' at line '%d'\n", yytext, linecount); } */
 
 /* Scanner subroutines, only has yywrap for now, returning 1 
 whenever the scanner has finished scanning a source file. */
