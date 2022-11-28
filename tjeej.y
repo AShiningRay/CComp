@@ -99,6 +99,7 @@ RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND COMMA
     value: NUMBER { add_symbol('C'); }
     | FLOAT_NUM   { add_symbol('C'); }
     | CHARACTER   { add_symbol('C'); }
+    | cond
     | ID
     ;
 
