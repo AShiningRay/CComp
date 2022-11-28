@@ -26,10 +26,10 @@
 %}
 
 /* Tokens currently supported by the scanner */
-%token VOID CHARACTER PRINTF SCANF INT BOOL FLOAT CHAR FOR IF 
-ELSE TRUE FALSE NUMBER FLOAT_NUM ID LE GE EQ NE GT LT AND OR 
-STR ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN LPAR 
-RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND COMMA
+%token VOID CHARACTER PRINTF SCANF INT UINT32 UINT16 UINT64 INT16 INT64
+LONG DOUBLE BOOL FLOAT CHAR FOR IF ELSE TRUE FALSE NUMBER FLOAT_NUM 
+ID LE GE EQ NE GT LT AND OR STR ADD MULTIPLY DIVIDE SUBTRACT UNARY 
+INCLUDE RETURN LPAR RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND COMMA
 
 
 /* Grammar definitions for the language */
@@ -48,10 +48,17 @@ RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND COMMA
 
     /* The currently supported datatypes are int, bool, float, char and void */
     datatype: INT { insert_type_on_table(); }
-    | BOOL    { insert_type_on_table(); }
-    | FLOAT   { insert_type_on_table(); }
-    | CHAR    { insert_type_on_table(); }
-    | VOID    { insert_type_on_table(); }
+    | UINT32       { insert_type_on_table(); }
+    | UINT16       { insert_type_on_table(); }
+    | UINT64       { insert_type_on_table(); }
+    | INT16        { insert_type_on_table(); }
+    | INT64        { insert_type_on_table(); }
+    | LONG         { insert_type_on_table(); }
+    | DOUBLE       { insert_type_on_table(); }
+    | BOOL         { insert_type_on_table(); }
+    | FLOAT        { insert_type_on_table(); }
+    | CHAR         { insert_type_on_table(); }
+    | VOID         { insert_type_on_table(); }
     ;
 
     /* For now, main doesn't support receiving any arguments */

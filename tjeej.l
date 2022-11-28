@@ -18,6 +18,12 @@ unary  "++"|"--"
 "printf"                            { return PRINTF; }
 "scanf"                             { return SCANF; }
 "int"                               { return INT; }
+"unsigned int"                      { return UINT32; }
+"unsigned short int"                { return UINT16; }
+"unsigned long int"                 { return UINT64; }
+"short int"                         { return INT16; }
+"long"                              { return INT64; }
+"double"                            { return DOUBLE; }
 "bool"                              { return BOOL; }
 "float"                             { return FLOAT; }
 "char"                              { return CHAR; }
