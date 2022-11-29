@@ -13,7 +13,7 @@
     /* Struct representing the symbol table */
     struct dataType
     {
-        int line_num;
+        unsigned int line_num;
         char *id, *dataspec, *datatype, *type_to_symtab;
     } symbol_table[255];
 
@@ -173,7 +173,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE
 
 int main()
 {
-    int i=0;
+    unsigned int i=0;
 
     yyparse();
 
@@ -198,10 +198,7 @@ int main()
 
         printf("\nProgram parsed successfully with no syntax errors!\n");
     }
-    else
-    {
-        printf("\nError parsing the program...\n");
-    }
+    else { printf("\nError parsing the program...\n"); }
 }
 
 void yyerror(const char* msg)
@@ -241,10 +238,11 @@ void add_symbol(char symtype)
             symbol_table[symbolnum].dataspec=strdup(symbolspec);  
             symbol_table[symbolnum].datatype=strdup(symboltype);
             symbol_table[symbolnum].line_num=linecount;
-            symbol_table[symbolnum].type_to_symtab=strdup("VARBL");   
+            if(strcmp(symbolspec, "const") != 0) { symbol_table[symbolnum].type_to_symtab=strdup("VARBL"); }
+            else { symbol_table[symbolnum].type_to_symtab=strdup("CONST"); }
             symbolnum++;  
         }
-        else if(symtype == 'C' || symbolspec == "CONST")
+        else if(symtype == 'C')
         { /* This one also checks if the variable was declared as const */
             symbol_table[symbolnum].id=strdup(yytext);
             symbol_table[symbolnum].dataspec=strdup(symbolspec);   
@@ -265,18 +263,13 @@ void add_symbol(char symtype)
     }
 }
 
-void insert_spec_on_table(int empty)
+void insert_spec_on_table(unsigned int empty)
 {
-    if(!empty)
-        strcpy(symbolspec, yytext);
-    else 
-        strcpy(symbolspec, "none");
+    if(!empty) { strcpy(symbolspec, yytext); }
+    else { strcpy(symbolspec, "none"); }
 }
 
-void insert_type_on_table()
-{
-    strcpy(symboltype, yytext);
-}
+void insert_type_on_table() { strcpy(symboltype, yytext); }
 
 int search_table(char *type)
 { 
