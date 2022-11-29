@@ -26,10 +26,12 @@
 %}
 
 /* Tokens currently supported by the scanner */
-%token VOID CHARACTER PRINTF SCANF INT UINT32 UINT16 UINT64 INT16 INT64
-LONG DOUBLE BOOL FLOAT CHAR FOR IF ELSE TRUE FALSE NUMBER FLOAT_NUM 
-ID LE GE EQ NE GT LT AND OR STR ADD MULTIPLY DIVIDE SUBTRACT UNARY 
+%token VOID CHARACTER PRINTF SCANF INT16 UINT16 INT32 UINT32 INT64 UINT64
+FLOAT32 FLOAT64 FLOAT128 BOOL CHAR8 UCHAR8 FOR IF ELSE TRUE FALSE NUMBER
+FLOAT_NUM ID LE GE EQ NE GT LT AND OR STR ADD MULTIPLY DIVIDE SUBTRACT UNARY
 INCLUDE RETURN LPAR RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND COMMA
+BREAK CASE CONST CONTINUE DEFAULT DO ENUM EXTERN GOTO STATIC WHILE SIZEOF
+UNION REGISTER SWITCH TYPEDEF VOLATILE
 
 
 /* Grammar definitions for the language */
@@ -47,18 +49,27 @@ INCLUDE RETURN LPAR RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND COMMA
     ;
 
     /* The currently supported datatypes are int, bool, float, char and void */
-    datatype: INT { insert_type_on_table(); }
-    | UINT32       { insert_type_on_table(); }
-    | UINT16       { insert_type_on_table(); }
-    | UINT64       { insert_type_on_table(); }
+    datatype: BOOL { insert_type_on_table(); }
     | INT16        { insert_type_on_table(); }
+    | UINT16       { insert_type_on_table(); }
+    | INT32        { insert_type_on_table(); }
+    | UINT32       { insert_type_on_table(); }
+    | UINT64       { insert_type_on_table(); }
     | INT64        { insert_type_on_table(); }
-    | LONG         { insert_type_on_table(); }
-    | DOUBLE       { insert_type_on_table(); }
-    | BOOL         { insert_type_on_table(); }
-    | FLOAT        { insert_type_on_table(); }
-    | CHAR         { insert_type_on_table(); }
+    | FLOAT32      { insert_type_on_table(); }
+    | FLOAT64      { insert_type_on_table(); }
+    | FLOAT128     { insert_type_on_table(); }
+    | CHAR8        { insert_type_on_table(); }
+    | UCHAR8       { insert_type_on_table(); }
     | VOID         { insert_type_on_table(); }
+    ;
+
+    dataspec: CONST
+    | EXTERN
+    | STATIC
+    | REGISTER
+    | VOLATILE
+    |
     ;
 
     /* For now, main doesn't support receiving any arguments */
@@ -77,7 +88,7 @@ INCLUDE RETURN LPAR RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND COMMA
 
     /* A statement can be a datatype initialization, an attribution to an 
     identifier, a relational operation between identifier and expression, etc. */
-    stmt: datatype var_decl;
+    stmt: dataspec datatype var_decl;
     | ID ATTRIB expr 
     | ID relop expr
     | ID UNARY 
