@@ -7,13 +7,14 @@
 
     int errorcount = 0, yylineno, yycolno, symbolnum = 0, symbolposfound;
     extern int linecount;
-    char symboltype[10];
+    char symboltype[24];
+    char symbolspec[16];
 
     /* Struct representing the symbol table */
     struct dataType
     {
         int line_num;
-        char *id, *datatype, *type_to_symtab;
+        char *id, *dataspec, *datatype, *type_to_symtab;
     } symbol_table[255];
 
     /* Function prototypes */
@@ -21,6 +22,7 @@
     int yylex();
     int yywrap();
     void add_symbol(char);
+    void insert_spec_on_table();
     void insert_type_on_table();
     int search_table(char*);
 %}
@@ -64,11 +66,11 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE
     | VOID         { insert_type_on_table(); }
     ;
 
-    dataspec: CONST
-    | EXTERN
-    | STATIC
-    | REGISTER
-    | VOLATILE
+    dataspec: CONST { insert_spec_on_table(); }
+    | EXTERN        { insert_spec_on_table(); }
+    | STATIC        { insert_spec_on_table(); }
+    | REGISTER      { insert_spec_on_table(); }
+    | VOLATILE      { insert_spec_on_table(); }
     |
     ;
 
@@ -177,12 +179,15 @@ int main()
 
     if(errorcount == 0)
     {
+        char *sname = "SYMBOL NAME", *sspec = "SYMBOL SPECIFIER", *stype = "SYMBOL TYPE", *sttbl = "TYPE ON TABLE", *lnum = "LINE NUM";
+        char *separator = "----------------------------------------------------------------------------------------------------------------------------------------------------------------";
         printf("SCANNER'S TOKEN MATCHING RESULTS:");
-        printf("\n\nGENERATED SYMBOL TABLE:");
-        printf("\nSYMBOL |  DATATYPE | TYPE ON TBL | LINE NUM \n");
-        printf("|______________________________________________|\n\n");
-        
-        for(i=0; i<symbolnum; i++) { printf("%s\t| %s\t| %s\t| %d\t\n", symbol_table[i].id, symbol_table[i].datatype, symbol_table[i].type_to_symtab, symbol_table[i].line_num); }
+        printf("\n\n  GENERATED SYMBOL TABLE:");
+        printf("\n| %-35s | %-16s | %-24s | %-13s | %-8s |", sname, sspec, stype, sttbl, lnum);
+        printf("\n|%.110s|", separator);
+
+        for(i=0; i<symbolnum; i++) { printf("\n| %-35s | %-16s | %-24s | %-13s | %-8d |", symbol_table[i].id, symbol_table[i].dataspec, symbol_table[i].datatype, symbol_table[i].type_to_symtab, symbol_table[i].line_num); }
+        printf("\n|%.110s|", separator);
 
         for(i=0;i<symbolnum;i++)
         {
@@ -191,7 +196,7 @@ int main()
         }
         printf("\n\n");
 
-        printf("Program parsed successfully with no syntax errors!\n");
+        printf("\nProgram parsed successfully with no syntax errors!\n");
     }
     else
     {
@@ -215,6 +220,7 @@ void add_symbol(char symtype)
         if(symtype == 'H')
         {
             symbol_table[symbolnum].id=strdup(yytext);        
+            symbol_table[symbolnum].dataspec=strdup("");   
             symbol_table[symbolnum].datatype=strdup(symboltype);     
             symbol_table[symbolnum].line_num=linecount;    
             symbol_table[symbolnum].type_to_symtab=strdup("HEADR");
@@ -223,6 +229,7 @@ void add_symbol(char symtype)
         else if(symtype == 'K')
         {
             symbol_table[symbolnum].id=strdup(yytext);
+            symbol_table[symbolnum].dataspec=strdup("");   
             symbol_table[symbolnum].datatype=strdup("none");
             symbol_table[symbolnum].line_num=linecount;
             symbol_table[symbolnum].type_to_symtab=strdup("KEYWD");   
@@ -231,14 +238,16 @@ void add_symbol(char symtype)
         else if(symtype == 'V')
         {
             symbol_table[symbolnum].id=strdup(yytext);
+            symbol_table[symbolnum].dataspec=strdup(symbolspec);  
             symbol_table[symbolnum].datatype=strdup(symboltype);
             symbol_table[symbolnum].line_num=linecount;
             symbol_table[symbolnum].type_to_symtab=strdup("VARBL");   
             symbolnum++;  
-        }  
-        else if(symtype == 'C')
-        {
+        }
+        else if(symtype == 'C' || symbolspec == "CONST")
+        { /* This one also checks if the variable was declared as const */
             symbol_table[symbolnum].id=strdup(yytext);
+            symbol_table[symbolnum].dataspec=strdup(symbolspec);   
             symbol_table[symbolnum].datatype=strdup("const");
             symbol_table[symbolnum].line_num=linecount;
             symbol_table[symbolnum].type_to_symtab=strdup("CONST");   
@@ -247,12 +256,18 @@ void add_symbol(char symtype)
         else if(symtype == 'F')
         {
             symbol_table[symbolnum].id=strdup(yytext);
+            symbol_table[symbolnum].dataspec=strdup(symbolspec);   
             symbol_table[symbolnum].datatype=strdup(symboltype);
             symbol_table[symbolnum].line_num=linecount;
             symbol_table[symbolnum].type_to_symtab=strdup("FUNCT");   
             symbolnum++;  
         }
     }
+}
+
+void insert_spec_on_table()
+{
+    strcpy(symbolspec, yytext);
 }
 
 void insert_type_on_table()
