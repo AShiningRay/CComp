@@ -66,12 +66,12 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE
     | VOID         { insert_type_on_table(); }
     ;
 
-    dataspec: CONST { insert_spec_on_table(); }
-    | EXTERN        { insert_spec_on_table(); }
-    | STATIC        { insert_spec_on_table(); }
-    | REGISTER      { insert_spec_on_table(); }
-    | VOLATILE      { insert_spec_on_table(); }
-    |
+    dataspec: CONST { insert_spec_on_table(0); }
+    | EXTERN        { insert_spec_on_table(0); }
+    | STATIC        { insert_spec_on_table(0); }
+    | REGISTER      { insert_spec_on_table(0); }
+    | VOLATILE      { insert_spec_on_table(0); }
+    | { insert_spec_on_table(1); }
     ;
 
     /* For now, main doesn't support receiving any arguments */
@@ -265,9 +265,12 @@ void add_symbol(char symtype)
     }
 }
 
-void insert_spec_on_table()
+void insert_spec_on_table(int empty)
 {
-    strcpy(symbolspec, yytext);
+    if(!empty)
+        strcpy(symbolspec, yytext);
+    else 
+        strcpy(symbolspec, "none");
 }
 
 void insert_type_on_table()
