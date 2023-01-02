@@ -75,6 +75,7 @@
         "SWITCH",                  /* SWITCH  */
         "TYPEDEF",                 /* TYPEDEF  */
         "VOLATILE"                 /* VOLATILE  */
+        "DEFINE"                   /* DEFINE */
     };
     char *separator = "-----------------------------------------------------------------------------";
     
@@ -131,6 +132,7 @@ unary  "++"|"--"
 "typedef"                                                                          { return printToken(TYPEDEF); }
 "volatile"                                                                         { return printToken(VOLATILE); }
 ^"#include"[ ]*<.+\.h>                                                             { return printToken(INCLUDE); }
+"#define"                                                                          { return printToken(DEFINE); }
 "true"                                                                             { return printToken(TRUE); }
 "false"                                                                            { return printToken(FALSE); }
 (_|{letter})({letter}|{digit}|_)*                                                  { return printToken(ID); }

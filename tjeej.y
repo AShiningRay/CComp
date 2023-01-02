@@ -35,7 +35,7 @@ FLOAT32 FLOAT64 FLOAT128 BOOL CHAR8 UCHAR8 FOR IF ELSE TRUE FALSE NUMBER
 FLOAT_NUM ID LE GE EQ NE GT LT AND OR STR ADD MULTIPLY DIVIDE SUBTRACT UNARY
 INCLUDE RETURN LPAR RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND COMMA
 BREAK CASE CONST CONTINUE DEFAULT DO ENUM EXTERN GOTO STATIC WHILE SIZEOF
-UNION REGISTER SWITCH TYPEDEF VOLATILE NOTOKEN
+UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE NOTOKEN
 
 
 /* Grammar definitions for the language */
@@ -45,7 +45,8 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE NOTOKEN
      * Defines the overall C program structure, usually composed of
      * headers, the main function and its body, then the return statement.
      */
-    prog: headers main LPAR RPAR LBRACK body return RBRACK
+    prog: headers defines typedefs main LPAR RPAR LBRACK body return RBRACK
+    | headers typedefs defines main LPAR RPAR LBRACK body return RBRACK
     ;
 
     /*
@@ -54,6 +55,17 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE NOTOKEN
      */
     headers: headers headers
     | INCLUDE { add_symbol('H'); }
+    ;
+
+    /* "define" directives are supported, although they don't amount to much
+    at a syntax analysis level. */
+    defines: defines defines
+    | DEFINE ID value { add_symbol('C'); }
+    ;
+
+    /* Typedefs don't work as they should yet. */
+    typedefs: typedefs typedefs
+    | TYPEDEF datatype ID { insert_type_on_table(); } STMTEND
     ;
 
     /* The currently supported datatypes are int, bool, float, char and void */
