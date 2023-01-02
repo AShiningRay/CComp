@@ -35,7 +35,7 @@ FLOAT32 FLOAT64 FLOAT128 BOOL CHAR8 UCHAR8 FOR IF ELSE TRUE FALSE NUMBER
 FLOAT_NUM ID LE GE EQ NE GT LT AND OR STR ADD MULTIPLY DIVIDE SUBTRACT UNARY
 INCLUDE RETURN LPAR RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND COMMA
 BREAK CASE CONST CONTINUE DEFAULT DO ENUM EXTERN GOTO STATIC WHILE SIZEOF
-UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE NOTOKEN
+UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
 
 
 /* Grammar definitions for the language */
@@ -45,8 +45,39 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE NOTOKEN
      * Defines the overall C program structure, usually composed of
      * headers, the main function and its body, then the return statement.
      */
-    prog: headers defines typedefs main LPAR RPAR LBRACK body return RBRACK
-    | headers typedefs defines main LPAR RPAR LBRACK body return RBRACK
+    prog: pre-main main LPAR RPAR LBRACK body return RBRACK
+    | pre-main main LPAR RPAR LBRACK body RBRACK
+    | pre-main main LPAR RPAR LBRACK return RBRACK
+    ;
+
+    /* 
+     * Pre-main contains those excerpts of code that must be placed before 
+     * main(), which is the case of headers, structs, etc. For 
+     * simplification, headers are assumed to always be the first directives
+     * before defines, structs and others in case they're present. Still,
+     * better find a way of simplifying all those rules, as they're bound
+     * to have shortcomings in the long term.
+     */
+    pre-main: headers
+    | defines
+    | typedefs
+    | structs
+    | headers structs
+    | headers typedefs
+    | headers defines
+    | headers structs typedefs
+    | headers structs defines
+    | headers typedefs structs
+    | headers typedefs defines
+    | headers defines structs
+    | headers defines typedefs 
+    | headers structs typedefs defines
+    | headers structs defines typedefs 
+    | headers typedefs structs defines
+    | headers defines structs typedefs 
+    | headers typedefs defines structs
+    | headers defines typedefs structs
+    |
     ;
 
     /*
@@ -60,12 +91,34 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE NOTOKEN
     /* "define" directives are supported, although they don't amount to much
     at a syntax analysis level. */
     defines: defines defines
-    | DEFINE ID value { add_symbol('C'); }
+    | DEFINE { add_symbol('K'); } ID value { add_symbol('C'); }
     ;
 
     /* Typedefs don't work as they should yet. */
     typedefs: typedefs typedefs
-    | TYPEDEF datatype ID { insert_type_on_table(); } STMTEND
+    | TYPEDEF { add_symbol('K'); } datatype ID STMTEND
+    ;
+
+    /* 
+     * Structs are complex datatypes that can house multiple simpler
+     * datatypes inside itself, and must contain either a tag before the 
+     * brackets, an ID after them, or both.
+     *
+     * WARNING: For now, only the last parsed struct gets its keyword 
+     * line number written into the parser's symbol table. 
+    */
+    structs: structs { add_symbol('K'); } structs
+    | STRUCT tag LBRACK struct-body RBRACK STMTEND
+    | STRUCT LBRACK struct-body RBRACK ID { add_symbol('V'); } STMTEND
+    | STRUCT tag LBRACK struct-body RBRACK ID { add_symbol('V'); } STMTEND
+    ;
+
+    struct-body: struct-body struct-body
+    | stmt
+    ;
+
+    /* Struct tag is a stub for now, since the tags can't simply be IDs. */
+    tag: ID
     ;
 
     /* The currently supported datatypes are int, bool, float, char and void */
@@ -100,9 +153,9 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE NOTOKEN
      * For the body, we have a set of rules of tokens, statements, loops
      * and conditionals that allows us to create a slew of different programs.
      */
-    body: FOR { add_symbol('K'); } LPAR stmt STMTEND cond STMTEND stmt RPAR LBRACK body RBRACK
+    body: FOR { add_symbol('K'); } LPAR stmt cond STMTEND stmt RPAR LBRACK body RBRACK
     | IF { add_symbol('K'); } LPAR cond RPAR LBRACK body RBRACK else
-    | stmt STMTEND 
+    | stmt
     | body body
     | PRINTF { add_symbol('K'); } LPAR STR RPAR STMTEND
     | SCANF  { add_symbol('K'); } LPAR STR COMMA '&' ID RPAR STMTEND
@@ -111,16 +164,19 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE NOTOKEN
     /*
      * A statement can be a datatype initialization, an attribution to an 
      * identifier, a relational operation between identifier and expression, etc.
+     * struct declaration below is a dirty fix for the time being.
      */
-    stmt: dataspec datatype var_decl;
-    | ID ATTRIB expr 
-    | ID relop expr
-    | ID UNARY 
-    | UNARY ID
+    stmt: dataspec datatype var_decl STMTEND
+    | dataspec STRUCT { insert_type_on_table(); } var_decl STMTEND
+    | ID ATTRIB expr STMTEND
+    | ID relop expr STMTEND
+    | ID UNARY STMTEND
+    | UNARY ID STMTEND
     ;
 
     /* A var declaration here is treated as an ID followed by an initialization. */
     var_decl: ID { add_symbol('V'); } init 
+    | tag ID { add_symbol('V'); }
     | var_decl COMMA var_decl
     ;
 

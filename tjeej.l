@@ -74,8 +74,10 @@
         "REGISTER",                /* REGISTER  */
         "SWITCH",                  /* SWITCH  */
         "TYPEDEF",                 /* TYPEDEF  */
-        "VOLATILE"                 /* VOLATILE  */
-        "DEFINE"                   /* DEFINE */
+        "VOLATILE",                /* VOLATILE  */
+        "DEFINE",                  /* DEFINE */
+        "STRUCT",                  /* STRUCT */
+        "NOTOKEN"                  /* NOTOKEN  */
     };
     char *separator = "-----------------------------------------------------------------------------";
     
@@ -130,6 +132,7 @@ unary  "++"|"--"
 "register"                                                                         { return printToken(REGISTER); }
 "switch"                                                                           { return printToken(SWITCH); }
 "typedef"                                                                          { return printToken(TYPEDEF); }
+"struct"                                                                           { return printToken(STRUCT); }
 "volatile"                                                                         { return printToken(VOLATILE); }
 ^"#include"[ ]*<.+\.h>                                                             { return printToken(INCLUDE); }
 "#define"                                                                          { return printToken(DEFINE); }
@@ -154,7 +157,6 @@ unary  "++"|"--"
 \/\/.*                                                                             { ; }
 \/\*(.*\n)*.*\*\/                                                                  { ; }
 [ \t]                                                                              { yycolno += 4; }
-[ \s]                                                                              { yycolno += 1; }
 [ \b]                                                                              { yycolno -= 1; }
 [ \n]                                                                              { yycolno = 1; }
 ["].*["]                                                                           { return printToken(STR); }
