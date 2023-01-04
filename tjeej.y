@@ -231,8 +231,8 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
      * In C, we don't actually need to initialize a variable when
      * declaring it, so the init definition can be produced into null.
      */
-    init: ATTRIB value 
-    |
+    init: ATTRIB expr
+    | 
     ;
 
     /* 
@@ -241,6 +241,8 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
      */
     expr: expr arith expr
     | value
+    | LPAR expr RPAR
+    | LPAR value RPAR
     ;
 
     /*
