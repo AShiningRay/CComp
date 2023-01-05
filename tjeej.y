@@ -129,6 +129,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     |
     ;
 
+
     /* 
      * Structs are complex datatypes that can house multiple simpler
      * datatypes inside itself, and must contain either a tag before the 
@@ -136,13 +137,14 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
      *
      * WARNING: For now, only the last parsed struct gets its keyword 
      * line number written into the parser's symbol table. 
-    */
+     */
     structs: struct-key tag LBRACK struct-body RBRACK STMTEND structs-add
     | struct-key LBRACK struct-body RBRACK struct-initvar STMTEND structs-add
     | struct-key tag LBRACK struct-body RBRACK struct-initvar STMTEND structs-add
     ;
 
     struct-key: STRUCT { add_symbol('K'); }
+    ;
 
     structs-add: structs
     |
@@ -155,12 +157,14 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     |
     ;
 
+
     /* Struct tag is a stub for now, since the tags can't simply be IDs. */
     tag: ID { add_symbol('T'); }
     ;
 
     struct-initvar: ID { insert_type_on_table("struct"); add_symbol('V'); } 
     ;
+
 
     /* The currently supported datatypes are int, bool, float, char and void */
     datatype: BOOL { insert_type_on_table("null"); }
@@ -198,12 +202,15 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
      * For the body, we have a set of rules of tokens, statements, loops
      * and conditionals that allows us to create a slew of different programs.
      */
-    body: FOR { add_symbol('K'); } LPAR stmt cond STMTEND stmt RPAR LBRACK body RBRACK
-    | IF { add_symbol('K'); } LPAR cond RPAR LBRACK body RBRACK else
-    | stmt
-    | body body
-    | PRINTF { add_symbol('K'); } LPAR STR RPAR STMTEND
-    | SCANF  { add_symbol('K'); } LPAR STR COMMA '&' ID RPAR STMTEND
+    body: FOR { add_symbol('K'); } LPAR stmt cond STMTEND stmt RPAR LBRACK body-add RBRACK body-add
+    | IF { add_symbol('K'); } LPAR cond RPAR LBRACK body-add RBRACK else body-add
+    | stmt body-add
+    | PRINTF { add_symbol('K'); } LPAR STR RPAR STMTEND body-add
+    | SCANF  { add_symbol('K'); } LPAR STR COMMA '&' ID RPAR STMTEND body-add
+    ;
+
+    body-add: body
+    |
     ;
 
 
@@ -211,8 +218,8 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
      * A statement can be a datatype initialization, an attribution to an 
      * identifier, a relational operation between identifier and expression, etc.
      */
-    stmt: dataspec datatype var_decl STMTEND
-    | dataspec struct_var_decl STMTEND
+    stmt: dataspec datatype var-decl STMTEND
+    | dataspec struct-var-decl STMTEND
     | ID ATTRIB expr STMTEND
     | ID relop expr STMTEND
     | ID UNARY STMTEND
@@ -221,8 +228,11 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
 
 
     /* A var declaration here is treated as an ID followed by an initialization. */
-    var_decl: ID { add_symbol('V'); } init 
-    | var_decl COMMA var_decl
+    var-decl: ID { add_symbol('V'); } init var-decl-add
+    ;
+
+    var-decl-add: COMMA var-decl
+    |
     ;
 
 
@@ -230,13 +240,17 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
      * Structs can't be declared just as a normal var does, they have a different 
      * syntax.
      */
-    struct_var_decl: struct_type struct_varname
-    
-    struct_type: STRUCT { insert_type_on_table("null"); } 
+    struct-var-decl: struct-type struct-varname
     ;
     
-    struct_varname: tag ID { add_symbol('V'); }
-    | struct_varname COMMA var_decl
+    struct-type: STRUCT { insert_type_on_table("null"); } 
+    ;
+    
+    struct-varname: tag ID { add_symbol('V'); } struct-varname-add
+    ;
+
+    struct-varname-add: COMMA var-decl
+    |
     ;
 
 
@@ -244,8 +258,11 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
      * A condition expresses the result of a relational operator between
      * two values, and can return either true or false.
      */
-    cond: value relop value 
-    | cond logop cond
+    cond: cond-term 
+    | cond-term logop cond
+    ;
+
+    cond-term: value relop value
     | TRUE  { add_symbol('K'); }
     | FALSE { add_symbol('K'); }
     ;
@@ -306,12 +323,15 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
      * Expressions can have arithmetic inside them, but they can also not
      * have any arithmetic at all.
      */
-    expr: expr arith expr
+    expr: value arith expr-add
+    | LPAR expr-add RPAR arith expr-add
+    | LPAR value RPAR expr-add
     | value
-    | LPAR expr RPAR
-    | LPAR value RPAR
     ;
 
+    expr-add: expr
+    |
+    ;
 
     /*
      * Arithmetic is initially comprised of addition, subtraction,
