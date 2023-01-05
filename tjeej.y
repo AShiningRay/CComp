@@ -86,23 +86,48 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
      * Defines the way by which includes are parsed. having two 'headers'
      * concatenated allows us to parse multiple header lines.
      */
-    headers: headers headers
-    | INCLUDE { add_symbol('H'); }
+    headers: INCLUDE { add_symbol('H'); } headers_add
+    ;
+
+    headers_add: headers
+    |
     ;
 
 
-    /* "define" directives are supported, although they don't amount to much
-    at a syntax analysis level. */
-    defines: defines defines
-    | DEFINE { add_symbol('K'); } ID value { add_symbol('C'); }
+    /* 
+     * "define" directives are supported, although they don't amount to much
+     * at a syntax analysis level yet. 
+     */
+    defines: define-key define-id define-val defines_add
+    ;
+
+    define-key: DEFINE { add_symbol('K'); }
+    ;
+
+    define-id: ID 
+    ;
+
+    define-val: value { add_symbol('C'); }
+    ;
+
+    defines_add: defines
+    |
     ;
 
 
-    /* Typedefs don't work as they should yet. */
-    typedefs: typedefs typedefs
-    | TYPEDEF { add_symbol('K'); } datatype ID STMTEND
+    /* 
+     * Typedefs don't work as they should yet. Need to add some way of adding
+     * new types and then checking them on later lines. 
+     */
+    typedefs: typedef-key datatype ID STMTEND typedefs_add
     ;
 
+    typedef-key: TYPEDEF { add_symbol('K'); }
+    ;
+
+    typedefs_add: typedefs
+    |
+    ;
 
     /* 
      * Structs are complex datatypes that can house multiple simpler
@@ -112,22 +137,30 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
      * WARNING: For now, only the last parsed struct gets its keyword 
      * line number written into the parser's symbol table. 
     */
-    structs: structs { add_symbol('K'); } structs
-    | STRUCT tag LBRACK struct-body RBRACK STMTEND
-    | STRUCT LBRACK struct-body RBRACK ID { add_symbol('V'); } STMTEND
-    | STRUCT tag LBRACK struct-body RBRACK ID { add_symbol('V'); } STMTEND
+    structs: struct-key tag LBRACK struct-body RBRACK STMTEND structs-add
+    | struct-key LBRACK struct-body RBRACK struct-var STMTEND structs-add
+    | struct-key tag LBRACK struct-body RBRACK struct-var STMTEND structs-add
     ;
 
+    struct-key: STRUCT { add_symbol('K'); }
 
-    struct-body: struct-body struct-body
-    | stmt
+    structs-add: structs
+    |
     ;
 
+    struct-body: stmt struct-body-add
+    ;
+
+    struct-body-add: struct-body
+    |
+    ;
 
     /* Struct tag is a stub for now, since the tags can't simply be IDs. */
-    tag: ID
+    tag: ID { add_symbol('T'); }
     ;
 
+    struct-var: ID { add_symbol('V'); } 
+    ;
 
     /* The currently supported datatypes are int, bool, float, char and void */
     datatype: BOOL { insert_type_on_table(); }
@@ -385,6 +418,15 @@ void add_symbol(char symtype)
             symbol_table[symbolnum].datatype=strdup(symboltype);
             symbol_table[symbolnum].line_num=yylineno;
             symbol_table[symbolnum].type_to_symtab=strdup("FUNCT");   
+            symbolnum++;  
+        }
+        else if(symtype == 'T')
+        {
+            symbol_table[symbolnum].id=strdup(yytext);
+            symbol_table[symbolnum].dataspec=strdup(symbolspec);   
+            symbol_table[symbolnum].datatype=strdup(symboltype);
+            symbol_table[symbolnum].line_num=yylineno;
+            symbol_table[symbolnum].type_to_symtab=strdup("SCTAG");   
             symbolnum++;  
         }
     }
