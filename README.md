@@ -8,4 +8,4 @@ To build the compiler, just execute `./build_tjeej.sh` and it will build TurboJe
 
 If you want to check for possible parser conflicts and ambiguities, run `./build_tjeej_debugconflicts.sh` instead, since that one will print a few examples for conflicts found within the parser.
 
-To test the compiler on the C sources provided by this repository, run `./a.out<test_sources/testfile.c>`.
+To test the compiler on the C sources provided by this repository, run `./a.out<test_sources/testfile.c`.

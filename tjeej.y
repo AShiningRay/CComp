@@ -50,6 +50,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     | pre-main main LPAR RPAR LBRACK return RBRACK
     ;
 
+
     /* 
      * Pre-main contains those excerpts of code that must be placed before 
      * main(), which is the case of headers, structs, etc. For 
@@ -80,6 +81,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     |
     ;
 
+
     /*
      * Defines the way by which includes are parsed. having two 'headers'
      * concatenated allows us to parse multiple header lines.
@@ -88,16 +90,19 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     | INCLUDE { add_symbol('H'); }
     ;
 
+
     /* "define" directives are supported, although they don't amount to much
     at a syntax analysis level. */
     defines: defines defines
     | DEFINE { add_symbol('K'); } ID value { add_symbol('C'); }
     ;
 
+
     /* Typedefs don't work as they should yet. */
     typedefs: typedefs typedefs
     | TYPEDEF { add_symbol('K'); } datatype ID STMTEND
     ;
+
 
     /* 
      * Structs are complex datatypes that can house multiple simpler
@@ -113,13 +118,16 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     | STRUCT tag LBRACK struct-body RBRACK ID { add_symbol('V'); } STMTEND
     ;
 
+
     struct-body: struct-body struct-body
     | stmt
     ;
 
+
     /* Struct tag is a stub for now, since the tags can't simply be IDs. */
     tag: ID
     ;
+
 
     /* The currently supported datatypes are int, bool, float, char and void */
     datatype: BOOL { insert_type_on_table(); }
@@ -137,6 +145,8 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     | VOID         { insert_type_on_table(); }
     ;
 
+
+    /* Datatypes can be specified as STATIC, CONST, etc. */
     dataspec: CONST { insert_spec_on_table(0); }
     | EXTERN        { insert_spec_on_table(0); }
     | STATIC        { insert_spec_on_table(0); }
@@ -145,9 +155,11 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     | { insert_spec_on_table(1); }
     ;
 
+
     /* For now, main doesn't support receiving any arguments */
     main: datatype ID { add_symbol('F'); }
     ;
+
 
     /*
      * For the body, we have a set of rules of tokens, statements, loops
@@ -161,24 +173,39 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     | SCANF  { add_symbol('K'); } LPAR STR COMMA '&' ID RPAR STMTEND
     ;
 
+
     /*
      * A statement can be a datatype initialization, an attribution to an 
      * identifier, a relational operation between identifier and expression, etc.
-     * struct declaration below is a dirty fix for the time being.
      */
     stmt: dataspec datatype var_decl STMTEND
-    | dataspec STRUCT { insert_type_on_table(); } var_decl STMTEND
+    | dataspec struct_var_decl STMTEND
     | ID ATTRIB expr STMTEND
     | ID relop expr STMTEND
     | ID UNARY STMTEND
     | UNARY ID STMTEND
     ;
 
+
     /* A var declaration here is treated as an ID followed by an initialization. */
     var_decl: ID { add_symbol('V'); } init 
-    | tag ID { add_symbol('V'); }
     | var_decl COMMA var_decl
     ;
+
+
+    /* 
+     * Structs can't be declared just as a normal var does, they have a different 
+     * syntax.
+     */
+    struct_var_decl: struct_type struct_varname
+    
+    struct_type: STRUCT { insert_type_on_table(); } 
+    ;
+    
+    struct_varname: tag ID { add_symbol('V'); }
+    | struct_varname COMMA var_decl
+    ;
+
 
     /* 
      * A condition expresses the result of a relational operator between
@@ -190,6 +217,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     | FALSE { add_symbol('K'); }
     ;
 
+
     /*
      * This production is a continuation of the IF ... else rule in the "body:"
      * definition above, and allows for the use of if-else as well as a single if.
@@ -198,6 +226,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     |
     ;
 
+
     /* Values can be a number, a float, a character and an identifier */
     value: NUMBER { add_symbol('C'); }
     | FLOAT_NUM   { add_symbol('C'); }
@@ -205,6 +234,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     | cond
     | ID
     ;
+
 
     /*
      * As for the relational operators, we have the usual ones:
@@ -223,9 +253,12 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     | NE
     ;
 
+
+    /* Logical operators are basically AND + OR for now */
     logop: AND
     | OR
     ;
+
 
     /*
      * In C, we don't actually need to initialize a variable when
@@ -234,6 +267,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     init: ATTRIB expr
     | 
     ;
+
 
     /* 
      * Expressions can have arithmetic inside them, but they can also not
@@ -245,6 +279,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     | LPAR value RPAR
     ;
 
+
     /*
      * Arithmetic is initially comprised of addition, subtraction,
      * multiplication and division.
@@ -254,6 +289,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     | MULTIPLY
     | DIVIDE
     ;
+
 
     /*
      * Return is yet another definition that can be produced into null
