@@ -25,7 +25,7 @@
     int yywrap();
     void add_symbol(char);
     void insert_spec_on_table();
-    void insert_type_on_table();
+    void insert_type_on_table(char *type);
     int search_table(char*);
 %}
 
@@ -138,8 +138,8 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
      * line number written into the parser's symbol table. 
     */
     structs: struct-key tag LBRACK struct-body RBRACK STMTEND structs-add
-    | struct-key LBRACK struct-body RBRACK struct-var STMTEND structs-add
-    | struct-key tag LBRACK struct-body RBRACK struct-var STMTEND structs-add
+    | struct-key LBRACK struct-body RBRACK struct-initvar STMTEND structs-add
+    | struct-key tag LBRACK struct-body RBRACK struct-initvar STMTEND structs-add
     ;
 
     struct-key: STRUCT { add_symbol('K'); }
@@ -159,23 +159,23 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     tag: ID { add_symbol('T'); }
     ;
 
-    struct-var: ID { add_symbol('V'); } 
+    struct-initvar: ID { insert_type_on_table("struct"); add_symbol('V'); } 
     ;
 
     /* The currently supported datatypes are int, bool, float, char and void */
-    datatype: BOOL { insert_type_on_table(); }
-    | INT16        { insert_type_on_table(); }
-    | UINT16       { insert_type_on_table(); }
-    | INT32        { insert_type_on_table(); }
-    | UINT32       { insert_type_on_table(); }
-    | UINT64       { insert_type_on_table(); }
-    | INT64        { insert_type_on_table(); }
-    | FLOAT32      { insert_type_on_table(); }
-    | FLOAT64      { insert_type_on_table(); }
-    | FLOAT128     { insert_type_on_table(); }
-    | CHAR8        { insert_type_on_table(); }
-    | UCHAR8       { insert_type_on_table(); }
-    | VOID         { insert_type_on_table(); }
+    datatype: BOOL { insert_type_on_table("null"); }
+    | INT16        { insert_type_on_table("null"); }
+    | UINT16       { insert_type_on_table("null"); }
+    | INT32        { insert_type_on_table("null"); }
+    | UINT32       { insert_type_on_table("null"); }
+    | UINT64       { insert_type_on_table("null"); }
+    | INT64        { insert_type_on_table("null"); }
+    | FLOAT32      { insert_type_on_table("null"); }
+    | FLOAT64      { insert_type_on_table("null"); }
+    | FLOAT128     { insert_type_on_table("null"); }
+    | CHAR8        { insert_type_on_table("null"); }
+    | UCHAR8       { insert_type_on_table("null"); }
+    | VOID         { insert_type_on_table("null"); }
     ;
 
 
@@ -232,7 +232,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
      */
     struct_var_decl: struct_type struct_varname
     
-    struct_type: STRUCT { insert_type_on_table(); } 
+    struct_type: STRUCT { insert_type_on_table("null"); } 
     ;
     
     struct_varname: tag ID { add_symbol('V'); }
@@ -438,7 +438,12 @@ void insert_spec_on_table(unsigned int empty)
     else { strcpy(symbolspec, "none"); }
 }
 
-void insert_type_on_table() { strcpy(symboltype, yytext); }
+void insert_type_on_table(char *type) 
+{
+    if(strcmp(type, "null") == 0){ strcpy(symboltype, yytext); }
+    else { strcpy(symboltype, type); }
+    
+}
 
 int search_table(char *type)
 { 
