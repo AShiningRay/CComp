@@ -77,6 +77,7 @@
         "VOLATILE",                /* VOLATILE  */
         "DEFINE",                  /* DEFINE */
         "STRUCT",                  /* STRUCT */
+        "MAIN",                    /* MAIN */
         "NOTOKEN"                  /* NOTOKEN  */
     };
     char *separator = "-----------------------------------------------------------------------------";
@@ -138,6 +139,7 @@ unary  "++"|"--"
 "#define"                                                                          { return printToken(DEFINE); }
 "true"                                                                             { return printToken(TRUE); }
 "false"                                                                            { return printToken(FALSE); }
+"main"                                                                             { return printToken(MAIN); }
 (_|{letter})({letter}|{digit}|_)*                                                  { return printToken(ID); }
 [-]?{digit}+                                                                       { return printToken(NUMBER); }
 {unary}                                                                            { return printToken(UNARY); }

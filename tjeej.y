@@ -35,8 +35,7 @@ FLOAT32 FLOAT64 FLOAT128 BOOL CHAR8 UCHAR8 FOR IF ELSE TRUE FALSE NUMBER
 FLOAT_NUM ID LE GE EQ NE GT LT AND OR STR ADD MULTIPLY DIVIDE SUBTRACT UNARY
 INCLUDE RETURN LPAR RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND COMMA
 BREAK CASE CONST CONTINUE DEFAULT DO ENUM EXTERN GOTO STATIC WHILE SIZEOF
-UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
-
+UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT MAIN NOTOKEN
 
 /* Grammar definitions for the language */
 %%
@@ -45,9 +44,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
      * Defines the overall C program structure, usually composed of
      * headers, the main function and its body, then the return statement.
      */
-    prog: pre-main main LPAR RPAR LBRACK body return RBRACK
-    | pre-main main LPAR RPAR LBRACK body RBRACK
-    | pre-main main LPAR RPAR LBRACK return RBRACK
+    prog: pre-main main
     ;
 
 
@@ -130,6 +127,29 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     ;
 
 
+    /* For now, main doesn't support receiving any arguments */
+    main: main-name LPAR RPAR LBRACK body return RBRACK
+    | main-name LPAR RPAR LBRACK body RBRACK
+    | main-name LPAR RPAR LBRACK return RBRACK
+    ;
+
+    main-name: datatype MAIN { add_symbol('F'); }
+    ;
+
+
+    /* 
+     * Prototypes allow for additional functions to be written
+     * below "main", making for cleaner and more readable code.
+     * *TODO* */
+
+
+    /*
+     * Functions can be any major block of code that has an
+     * entry point (i.e. can be called by main for example)
+     * and can be used to isolate sections of code.
+     * *TODO* */
+
+
     /* 
      * Structs are complex datatypes that can house multiple simpler
      * datatypes inside itself, and must contain either a tag before the 
@@ -190,11 +210,6 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT NOTOKEN
     | REGISTER      { insert_spec_on_table(0); }
     | VOLATILE      { insert_spec_on_table(0); }
     | { insert_spec_on_table(1); }
-    ;
-
-
-    /* For now, main doesn't support receiving any arguments */
-    main: datatype ID { add_symbol('F'); }
     ;
 
 
