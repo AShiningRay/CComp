@@ -10,4 +10,7 @@ If you want to check for possible parser conflicts and ambiguities, run `./build
 
 To test the compiler on the C sources provided by this repository, run `./a.out<test_sources/testfile.c`.
 
-After adding files to be tested in .sh file you need to use `chmod +x test_scripts.sh` to make the file executable, and to run the .sh file use `./test_scripts.sh`.
+The .sh file gets automatically all files inside test_sources folder, and 
+to run the .sh file use `./test_scripts.sh`. 
+ 
+ In case of changing the .sh file for some reason, use `chmod +x test_scripts.sh` to make the file executable again.
