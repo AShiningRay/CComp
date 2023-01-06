@@ -6,7 +6,7 @@
 int main()
 {
     // Open a file for writing
-    FILE* file = fopen("output.txt", "w");
+    FILE *file = fopen("output.txt", "w");
 
     // Check if the file was opened successfully
     if (file == NULL) {
