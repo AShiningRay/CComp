@@ -128,14 +128,23 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT MAIN NOTOKEN
 
 
     /* For now, main doesn't support receiving any arguments */
-    main: main-name LPAR RPAR LBRACK body return RBRACK
-    | main-name LPAR RPAR LBRACK body RBRACK
-    | main-name LPAR RPAR LBRACK return RBRACK
+    main: main-name LPAR main-params RPAR LBRACK body return RBRACK
+    | main-name LPAR main-params RPAR LBRACK body RBRACK
+    | main-name LPAR main-params RPAR LBRACK return RBRACK
     ;
 
     main-name: datatype MAIN { add_symbol('F'); }
     ;
 
+    main-params: argc COMMA argv LBRACE RBRACE
+    | 
+    ;
+
+    argc: datatype ID { add_symbol('V'); }
+    ;
+
+    argv: datatype MULTIPLY ID { add_symbol('V'); }
+    ;
 
     /* 
      * Prototypes allow for additional functions to be written
@@ -170,7 +179,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT MAIN NOTOKEN
     |
     ;
 
-    struct-body: stmt struct-body-add
+    struct-body: stmt STMTEND struct-body-add
     ;
 
     struct-body-add: struct-body
@@ -217,11 +226,32 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT MAIN NOTOKEN
      * For the body, we have a set of rules of tokens, statements, loops
      * and conditionals that allows us to create a slew of different programs.
      */
-    body: FOR { add_symbol('K'); } LPAR stmt cond STMTEND stmt RPAR LBRACK body-add RBRACK body-add
+    body: for-key LPAR stmt STMTEND cond STMTEND stmt RPAR LBRACK body-add RBRACK body-add
     | IF { add_symbol('K'); } LPAR cond RPAR LBRACK body-add RBRACK else body-add
-    | stmt body-add
-    | PRINTF { add_symbol('K'); } LPAR STR RPAR STMTEND body-add
-    | SCANF  { add_symbol('K'); } LPAR STR COMMA '&' ID RPAR STMTEND body-add
+    | stmt STMTEND body-add
+    | printf-key printf-body body-add
+    | scanf-key LPAR STR COMMA '&' ID RPAR STMTEND body-add
+    ;
+
+    for-key: FOR { add_symbol('K'); }
+    ;
+
+    printf-key: PRINTF { add_symbol('K'); }
+    ;
+
+    printf-body: LPAR STR RPAR STMTEND
+    | LPAR STR printf-params RPAR STMTEND
+    ;
+
+    printf-params: COMMA declared-var printf-params-add
+    | 
+    ;
+
+    printf-params-add: COMMA declared-var printf-params
+    |
+    ;
+
+    scanf-key: SCANF { add_symbol('K'); }
     ;
 
     body-add: body
@@ -233,17 +263,28 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT MAIN NOTOKEN
      * A statement can be a datatype initialization, an attribution to an 
      * identifier, a relational operation between identifier and expression, etc.
      */
-    stmt: dataspec datatype var-decl STMTEND
-    | dataspec struct-var-decl STMTEND
-    | ID ATTRIB expr STMTEND
-    | ID relop expr STMTEND
-    | ID UNARY STMTEND
-    | UNARY ID STMTEND
+    stmt: dataspec datatype var-decl
+    | dataspec struct-var-decl
+    | declared-var ATTRIB expr
+    | declared-var ATTRIB declared-var
+    | declared-var relop expr
+    | ID UNARY
+    | UNARY ID
+    ;
+
+    declared-var: ID
+    | ID LBRACE ID RBRACE
+    | ID LBRACE NUMBER RBRACE
     ;
 
 
     /* A var declaration here is treated as an ID followed by an initialization. */
-    var-decl: ID { add_symbol('V'); } init var-decl-add
+    var-decl: var-key init var-decl-add
+    | var-key LBRACE RBRACE init var-decl-add
+    | var-key LBRACE NUMBER RBRACE init var-decl-add
+    ;
+
+    var-key: ID { add_symbol('V'); }
     ;
 
     var-decl-add: COMMA var-decl
@@ -364,8 +405,11 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT MAIN NOTOKEN
      * since we don't need to explicitly issue a return command in C's 
      * functions all the time.
      */
-    return: RETURN { add_symbol('K'); } value STMTEND 
+    return: return-key value STMTEND 
     |
+    ;
+
+    return-key: RETURN { add_symbol('K'); }
     ;
 
 %%
