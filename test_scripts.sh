@@ -4,12 +4,13 @@ RED='\033[0;31m' # Red
 NC='\033[0m' # No Color
 Yellow='\033[0;33m' # Yellow
 
-echo -e "${RED}Testing Malloc, Calloc and Realloc file${NC}" 
-echo
-sudo ./a.out<test_sources/malloc_test.c
-echo
-echo -e "${Yellow}---------------------${NC}"
-echo
-echo -e "${RED}Testing array file${NC}"
-echo
-sudo ./a.out<test_sources/array_test.c
+search_dir=test_sources
+for entry in "$search_dir"/*
+do
+  echo -e "${RED} TESTING $entry ${NC}"
+  echo 
+  ./a.out<$entry
+  echo
+  echo -e "${Yellow}---------------------${NC}"
+  echo
+done
