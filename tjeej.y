@@ -35,7 +35,8 @@ FLOAT32 FLOAT64 FLOAT128 BOOL CHAR8 UCHAR8 FOR IF ELSE TRUE FALSE NUMBER
 FLOAT_NUM ID LE GE EQ NE GT LT AND OR STR ADD MULTIPLY DIVIDE SUBTRACT UNARY
 INCLUDE RETURN LPAR RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND COMMA
 BREAK CASE CONST CONTINUE DEFAULT DO ENUM EXTERN GOTO STATIC WHILE SIZEOF
-UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT MAIN NOTOKEN
+UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT MAIN BITAND BITOR 
+NOTOKEN
 
 /* Grammar definitions for the language */
 %%
@@ -143,7 +144,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT MAIN NOTOKEN
     argc: datatype ID { add_symbol('V'); }
     ;
 
-    argv: datatype MULTIPLY ID { add_symbol('V'); }
+    argv: datatype MULTIPLY ID { add_symbol('P'); }
     ;
 
     /* 
@@ -230,7 +231,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT MAIN NOTOKEN
     | IF { add_symbol('K'); } LPAR cond RPAR LBRACK body-add RBRACK else body-add
     | stmt STMTEND body-add
     | printf-key printf-body body-add
-    | scanf-key LPAR STR COMMA '&' ID RPAR STMTEND body-add
+    | scanf-key LPAR STR COMMA BITAND ID RPAR STMTEND body-add
     ;
 
     for-key: FOR { add_symbol('K'); }
@@ -267,6 +268,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT MAIN NOTOKEN
     | dataspec struct-var-decl
     | declared-var ATTRIB expr
     | declared-var ATTRIB declared-var
+    | declared-var ATTRIB BITAND declared-var
     | declared-var relop expr
     | ID UNARY
     | UNARY ID
@@ -275,6 +277,9 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT MAIN NOTOKEN
     declared-var: ID
     | ID LBRACE ID RBRACE
     | ID LBRACE NUMBER RBRACE
+    | MULTIPLY ID
+    | BITAND ID
+    | BITAND ID LBRACE NUMBER RBRACE
     ;
 
 
@@ -285,6 +290,7 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT MAIN NOTOKEN
     ;
 
     var-key: ID { add_symbol('V'); }
+    | MULTIPLY ID { add_symbol('P'); }
     ;
 
     var-decl-add: COMMA var-decl
@@ -360,9 +366,14 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT MAIN NOTOKEN
     ;
 
 
-    /* Logical operators are basically AND + OR for now */
+    /* 
+     * Logical operators are basically AND + OR + bitwise variants 
+     * of those for now. 
+     */
     logop: AND
     | OR
+    | BITAND
+    | BITOR
     ;
 
 
@@ -371,7 +382,9 @@ UNION REGISTER SWITCH TYPEDEF VOLATILE DEFINE STRUCT MAIN NOTOKEN
      * declaring it, so the init definition can be produced into null.
      */
     init: ATTRIB expr
-    | 
+    | ATTRIB declared-var
+    | ATTRIB BITAND declared-var 
+    |
     ;
 
 
@@ -506,6 +519,15 @@ void add_symbol(char symtype)
             symbol_table[symbolnum].datatype=strdup(symboltype);
             symbol_table[symbolnum].line_num=yylineno;
             symbol_table[symbolnum].type_to_symtab=strdup("SCTAG");   
+            symbolnum++;  
+        }
+        else if(symtype == 'P')
+        {
+            symbol_table[symbolnum].id=strdup(yytext);
+            symbol_table[symbolnum].dataspec=strdup(symbolspec);   
+            symbol_table[symbolnum].datatype=strdup(symboltype);
+            symbol_table[symbolnum].line_num=yylineno;
+            symbol_table[symbolnum].type_to_symtab=strdup("PNTER");   
             symbolnum++;  
         }
     }

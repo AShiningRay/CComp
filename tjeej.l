@@ -78,6 +78,8 @@
         "DEFINE",                  /* DEFINE */
         "STRUCT",                  /* STRUCT */
         "MAIN",                    /* MAIN */
+        "BITAND",                  /* BITAND */
+        "BITOR",                  /* BITOR */
         "NOTOKEN"                  /* NOTOKEN  */
     };
     char *separator = "-----------------------------------------------------------------------------";
@@ -151,6 +153,8 @@ unary  "++"|"--"
 "<"                                                                                { return printToken(LT); }
 "&&"                                                                               { return printToken(AND); }
 "||"                                                                               { return printToken(OR); }
+"&"                                                                                { return printToken(BITAND); }
+"|"                                                                                { return printToken(BITOR); }
 "+"                                                                                { return printToken(ADD); }
 "-"                                                                                { return printToken(SUBTRACT); }
 "/"                                                                                { return printToken(DIVIDE); }
