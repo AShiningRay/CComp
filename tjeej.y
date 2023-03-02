@@ -43,11 +43,10 @@ NOTOKEN
 
     /* 
      * Defines the overall C program structure, usually composed of
-     * headers, the main function and its body, then the return statement.
+     * headers, the functions and their bodies, then the return statement.
      */
-    prog: pre-main main
+    prog: pre-funcs funcs
     ;
-
 
     /* 
      * Pre-main contains those excerpts of code that must be placed before 
@@ -57,7 +56,7 @@ NOTOKEN
      * better find a way of simplifying all those rules, as they're bound
      * to have shortcomings in the long term.
      */
-    pre-main: headers
+    pre-funcs: headers
     | defines
     | typedefs
     | structs
@@ -128,7 +127,38 @@ NOTOKEN
     ;
 
 
-    /* For now, main doesn't support receiving any arguments */
+    /* This one allows for functions and prototypes, also defines main() */
+    funcs: main funcs-add
+    | func-name LPAR func-params RPAR STMTEND funcs-add
+    | func-name LPAR func-params RPAR LBRACK body return RBRACK funcs-add
+    | func-name LPAR func-params RPAR LBRACK body RBRACK funcs-add
+    | func-name LPAR func-params RPAR LBRACK return RBRACK funcs-add
+    ;
+    
+    funcs-add: funcs
+    |
+    ;
+
+    func-name: datatype ID { add_symbol('F'); }
+
+    func-params: dataspec datatype func-var-decl
+    |
+    ;
+
+    func-var-decl: func-var-key func-var-decl-add
+    | func-var-key LBRACE RBRACE func-var-decl-add
+    ;
+
+    func-var-key: ID { add_symbol('V'); }
+    | MULTIPLY ID { add_symbol('P'); }
+    ;
+
+    func-var-decl-add: COMMA dataspec datatype func-var-decl
+    |
+    ;
+
+
+    /* The mandatory main function for C */
     main: main-name LPAR main-params RPAR LBRACK body return RBRACK
     | main-name LPAR main-params RPAR LBRACK body RBRACK
     | main-name LPAR main-params RPAR LBRACK return RBRACK
@@ -146,19 +176,6 @@ NOTOKEN
 
     argv: datatype MULTIPLY ID { add_symbol('P'); }
     ;
-
-    /* 
-     * Prototypes allow for additional functions to be written
-     * below "main", making for cleaner and more readable code.
-     * *TODO* */
-
-
-    /*
-     * Functions can be any major block of code that has an
-     * entry point (i.e. can be called by main for example)
-     * and can be used to isolate sections of code.
-     * *TODO* */
-
 
     /* 
      * Structs are complex datatypes that can house multiple simpler
@@ -237,7 +254,7 @@ NOTOKEN
     ;
 
     body-add: body
-    | return
+    |
     ;
 
     for-key: FOR { add_symbol('K'); }
