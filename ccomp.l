@@ -1,6 +1,6 @@
-/* TurboJeeJio C Scanner */
+/* CComp C Scanner */
 %{
-    #include "tjeej.tab.h"
+    #include "ccomp.tab.h"
     extern int yycolno; /* Stores the column number for debugging */
 
     int first_token = 1;

@@ -1,4 +1,4 @@
-/* TurboJeeJio C Parser */
+/* CComp C Parser */
 
 %{
     #include <stdio.h>

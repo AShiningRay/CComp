@@ -17,7 +17,7 @@ BUILD()
 	# Start building the parser source
 	echo -e "\n\n${COLOR_Y}Building parser source...${COLOR_N}"	
 	
-	if bison -v -d tjeej.y -Wcounterexamples; then
+	if bison -v -d ccomp.y -Wcounterexamples; then
 		echo -e "${COLOR_C}\nParser source was built successfully! Moving on...${COLOR_N}"
 		BUILT_LAST=$PROGTOBUILD # Saves the source's name, as it's now the last built
 	else
@@ -28,7 +28,7 @@ BUILD()
 
 	echo -e "${COLOR_Y}\n\nBuilding Scanner (LEX) source...${COLOR_N}"	
 
-	if lex tjeej.l; then
+	if lex ccomp.l; then
 		echo -e "${COLOR_C}\nScanner source was built successfully! Moving on..${COLOR_N}"
 		BUILT_LAST=$PROGTOBUILD # Saves the source's name, as it's now the last built
 	else
@@ -39,7 +39,7 @@ BUILD()
 
 	echo -e "${COLOR_Y}\n\nBuilding .tab.c file...${COLOR_N}"	
 
-	if gcc tjeej.tab.c; then
+	if gcc ccomp.tab.c; then
 		echo -e "${COLOR_C}\nAll files built successfully!${COLOR_N}"
 		BUILT_LAST=$PROGTOBUILD # Saves the source's name, as it's now the last built
 	else
