@@ -31,7 +31,7 @@
 
 /* Tokens currently supported by the scanner */
 %token VOID CHARACTER PRINTF SCANF INT16 UINT16 INT32 UINT32 INT64 UINT64
-FLOAT32 FLOAT64 FLOAT128 BOOL CHAR8 UCHAR8 FOR IF ELSE TRUE FALSE NUMBER
+FLOAT32 FLOAT64 FLOAT128 BOOL CHAR8 UCHAR8 FILEP FOR IF ELSE TRUE FALSE NUMBER
 FLOAT_NUM ID LE GE EQ NE GT LT AND OR STR ADD MULTIPLY DIVIDE SUBTRACT UNARY
 INCLUDE RETURN LPAR RPAR LBRACK RBRACK LBRACE RBRACE ATTRIB STMTEND COMMA
 BREAK CASE CONST CONTINUE DEFAULT DO ENUM EXTERN GOTO STATIC WHILE SIZEOF
@@ -209,6 +209,7 @@ NOTOKEN
     | FLOAT128     { insert_type_on_table("null"); }
     | CHAR8        { insert_type_on_table("null"); }
     | UCHAR8       { insert_type_on_table("null"); }
+    | FILEP        { insert_type_on_table("null"); }
     | VOID         { insert_type_on_table("null"); }
     ;
 
@@ -231,7 +232,12 @@ NOTOKEN
     | IF { add_symbol('K'); } LPAR cond RPAR LBRACK body-add RBRACK else body-add
     | stmt STMTEND body-add
     | printf-key printf-body body-add
-    | scanf-key LPAR STR COMMA BITAND ID RPAR STMTEND body-add
+    | scanf-key scanf-body body-add
+    | func-call STMTEND body-add
+    ;
+
+    body-add: body
+    | return
     ;
 
     for-key: FOR { add_symbol('K'); }
@@ -245,17 +251,28 @@ NOTOKEN
     ;
 
     printf-params: COMMA declared-var printf-params-add
-    | 
-    ;
-
-    printf-params-add: COMMA declared-var printf-params
+    | COMMA expr printf-params
     |
     ;
 
+    printf-params-add: COMMA declared-var printf-params
+    | COMMA expr printf-params
+    |
+    ;
+
+    /* */
     scanf-key: SCANF { add_symbol('K'); }
     ;
 
-    body-add: body
+    scanf-body: LPAR STR COMMA scanf-params RPAR STMTEND
+    | 
+    ;
+
+    scanf-params: ID scanf-params-add
+    | BITAND ID scanf-params-add
+    ;
+
+    scanf-params-add: COMMA scanf-params
     |
     ;
 
@@ -387,7 +404,6 @@ NOTOKEN
     |
     ;
 
-
     /* 
      * Expressions can have arithmetic inside them, but they can also not
      * have any arithmetic at all.
@@ -395,10 +411,29 @@ NOTOKEN
     expr: value arith expr-add
     | LPAR expr-add RPAR arith expr-add
     | LPAR value RPAR expr-add
+    | func-call
     | value
     ;
 
     expr-add: expr
+    |
+    ;
+
+    /* 
+     * This rule parses function calls (NOTE: This parser doesn't support 
+     * actually defining the functions yet) 
+     */
+    func-call: ID LPAR call-args RPAR
+    ;
+
+    /* Arguments passed to the function call */
+    call-args: ID call-args-add
+    | STR call-args-add
+    | NUMBER call-args-add
+    |
+    ;
+
+    call-args-add: COMMA call-args
     |
     ;
 

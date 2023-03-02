@@ -1,5 +1,5 @@
 
-// Writing test file in C (NOT WORKING - POINTER ERROR)
+// Writing test file in C (NOT WORKING - POINTER ERROR, parses but semantically it should fail)
 
 #include <stdio.h>
 

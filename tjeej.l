@@ -25,6 +25,7 @@
         "BOOL",                    /* BOOL  */
         "CHAR8",                   /* CHAR8  */
         "UCHAR8",                  /* UCHAR8  */
+        "FILEP",                    /* FILEP  */
         "FOR",                     /* FOR  */
         "IF",                      /* IF  */
         "ELSE",                    /* ELSE  */
@@ -110,6 +111,7 @@ unary  "++"|"--"
 "unsigned long"|"unsigned long int"                                                { return printToken(UINT32); }
 "long long"|"signed long long"|"long long int"|"signed long long int"              { return printToken(INT64); }
 "unsigned long long"|"unsigned long long int"                                      { return printToken(UINT64); }
+"FILE"                                                                             { return printToken(FILEP); }
 "float"                                                                            { return printToken(FLOAT32); }
 "double"                                                                           { return printToken(FLOAT64); }
 "long double"                                                                      { return printToken(FLOAT128); }
