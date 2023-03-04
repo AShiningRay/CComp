@@ -4,7 +4,7 @@ struct person
 {
 	int age = 45;
 	char first_letter = 'D';
-	float weight: 65.4;
+	float weight = 65.4;
 };
 
 int main ()

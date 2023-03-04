@@ -83,7 +83,7 @@
         "BITOR",                  /* BITOR */
         "NOTOKEN"                  /* NOTOKEN  */
     };
-    char *separator = "-----------------------------------------------------------------------------";
+    char *separator = "----------------------------------------------------------------------------------";
     
     int printToken(int tok);
 %}
@@ -192,9 +192,9 @@ int printToken(int tok) {
     {
         if(first_token) 
         {
-            printf("SCANNER-GENERATED TOKEN TABLE:\n| %-25s | %-12s |\n", tok_name, tok_class);
-            printf("|%.42s|\n", separator);
-            printf("| %-25s | %-12s |\n", yytext, *((token_name + 0) + (tok-256)) );
+            printf("SCANNER-GENERATED TOKEN TABLE:\n| %-65s | %-12s |\n", tok_name, tok_class);
+            printf("|%.102s|\n", separator);
+            printf("| %-65s | %-12s |\n", yytext, *((token_name + 0) + (tok-256)) );
             first_token--;
         }
         else 
@@ -204,7 +204,7 @@ int printToken(int tok) {
              * needs to have its index subtracted by this value in order to print the name 
              * accurately, as our token name array starts from 0 as all arrays should. 
              */
-            printf("| %-25s | %-12s |\n", yytext, *((token_name + 0) + (tok-256)) );
+            printf("| %-65s | %-12s |\n", yytext, *((token_name + 0) + (tok-256)) );
         }
     }
 

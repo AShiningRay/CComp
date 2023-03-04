@@ -130,9 +130,7 @@ NOTOKEN
     /* This one allows for functions and prototypes, also defines main() */
     funcs: main funcs-add
     | func-name LPAR func-params RPAR STMTEND funcs-add
-    | func-name LPAR func-params RPAR LBRACK body return RBRACK funcs-add
     | func-name LPAR func-params RPAR LBRACK body RBRACK funcs-add
-    | func-name LPAR func-params RPAR LBRACK return RBRACK funcs-add
     ;
     
     funcs-add: funcs
@@ -159,9 +157,7 @@ NOTOKEN
 
 
     /* The mandatory main function for C */
-    main: main-name LPAR main-params RPAR LBRACK body return RBRACK
-    | main-name LPAR main-params RPAR LBRACK body RBRACK
-    | main-name LPAR main-params RPAR LBRACK return RBRACK
+    main: main-name LPAR main-params RPAR LBRACK body RBRACK
     ;
 
     main-name: datatype MAIN { add_symbol('F'); }
@@ -251,6 +247,7 @@ NOTOKEN
     | printf-key printf-body body-add
     | scanf-key scanf-body body-add
     | func-call STMTEND body-add
+    | return
     ;
 
     body-add: body
@@ -300,12 +297,17 @@ NOTOKEN
      */
     stmt: dataspec datatype var-decl
     | dataspec struct-var-decl
-    | declared-var ATTRIB expr
-    | declared-var ATTRIB declared-var
-    | declared-var ATTRIB BITAND declared-var
+    | declared-var var-attrib expr
+    | declared-var var-attrib LBRACK arr-def RBRACK
+    | declared-var var-attrib declared-var
+    | declared-var var-attrib BITAND declared-var
     | declared-var relop expr
     | ID UNARY
     | UNARY ID
+    ;
+
+    var-attrib: ATTRIB
+    | arith ATTRIB
     ;
 
     declared-var: ID
@@ -319,18 +321,36 @@ NOTOKEN
 
     /* A var declaration here is treated as an ID followed by an initialization. */
     var-decl: var-key init var-decl-add
-    | var-key LBRACE RBRACE init var-decl-add
-    | var-key LBRACE NUMBER RBRACE init var-decl-add
+    | var-key arr-dim init var-decl-add
     ;
 
     var-key: ID { add_symbol('V'); }
     | MULTIPLY ID { add_symbol('P'); }
     ;
 
+    arr-dim: LBRACE arr-size RBRACE arr-dim-add
+    ;
+
+    arr-dim-add: arr-dim
+    |
+    ;
+
+    /* Special rule for array sizes */
+    arr-size: ID
+    | NUMBER
+    ;
+
     var-decl-add: COMMA var-decl
     |
     ;
 
+    /* Special rule for array value definitions on declaration */
+    arr-def: value arr-def-add
+    ;
+
+    arr-def-add: COMMA arr-def
+    |
+    ;
 
     /* 
      * Structs can't be declared just as a normal var does, they have a different 
@@ -379,6 +399,8 @@ NOTOKEN
     | CHARACTER   { add_symbol('C'); }
     | cond
     | ID
+    | SIZEOF LPAR datatype RPAR
+    | STR         { add_symbol('C'); }
     ;
 
 
@@ -418,6 +440,7 @@ NOTOKEN
     init: ATTRIB expr
     | ATTRIB declared-var
     | ATTRIB BITAND declared-var 
+    | ATTRIB LBRACK arr-def RBRACK
     |
     ;
 
@@ -427,7 +450,7 @@ NOTOKEN
      */
     expr: value arith expr-add
     | LPAR expr-add RPAR arith expr-add
-    | LPAR value RPAR expr-add
+    | LPAR expr-add RPAR expr-add
     | func-call
     | value
     ;
@@ -444,9 +467,7 @@ NOTOKEN
     ;
 
     /* Arguments passed to the function call */
-    call-args: ID call-args-add
-    | STR call-args-add
-    | NUMBER call-args-add
+    call-args: expr call-args-add
     |
     ;
 
@@ -471,6 +492,7 @@ NOTOKEN
      * functions all the time.
      */
     return: return-key value STMTEND 
+    | return-key STMTEND
     |
     ;
 
