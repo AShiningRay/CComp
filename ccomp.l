@@ -1,7 +1,7 @@
 /* CComp C Scanner */
 %{
     #include "ccomp.tab.h"
-    extern int yycolno; /* Stores the column number for debugging */
+    int yytokno = 0; /* Stores the current token number on each line for debugging */
 
     int first_token = 1;
     char *tok_name = "LEXEME", *tok_class = "TOKEN CLASS";
@@ -101,84 +101,84 @@ unary  "++"|"--"
  */
 %%
 
-"printf"                                                                           { return printToken(PRINTF); }
-"scanf"                                                                            { return printToken(SCANF); }
-"char"|"signed char"                                                               { return printToken(CHAR8); }
-"unsigned char"                                                                    { return printToken(UCHAR8); }
-"int"|"signed int"|"signed"|"short"|"short int"|"signed short"|"signed short int"  { return printToken(INT16); }
-"unsigned"|"unsigned int"|"unsigned short"|"unsigned short int"                    { return printToken(UINT16); }
-"long int"|"signed long int"|"long"|"signed long"                                  { return printToken(INT32); }
-"unsigned long"|"unsigned long int"                                                { return printToken(UINT32); }
-"long long"|"signed long long"|"long long int"|"signed long long int"              { return printToken(INT64); }
-"unsigned long long"|"unsigned long long int"                                      { return printToken(UINT64); }
-"FILE"                                                                             { return printToken(FILEP); }
-"float"                                                                            { return printToken(FLOAT32); }
-"double"                                                                           { return printToken(FLOAT64); }
-"long double"                                                                      { return printToken(FLOAT128); }
-"bool"                                                                             { return printToken(BOOL); }
-"void"                                                                             { return printToken(VOID); }
-"return"                                                                           { return printToken(RETURN); }
-"for"                                                                              { return printToken(FOR); }
-"if"                                                                               { return printToken(IF); }
-"else"                                                                             { return printToken(ELSE); }
-"break"                                                                            { return printToken(BREAK); }
-"case"                                                                             { return printToken(CASE); }
-"const"                                                                            { return printToken(CONST); }
-"continue"                                                                         { return printToken(CONTINUE); }
-"default"                                                                          { return printToken(DEFAULT); }
-"do"                                                                               { return printToken(DO); }
-"enum"                                                                             { return printToken(ENUM); }
-"extern"                                                                           { return printToken(EXTERN); }
-"goto"                                                                             { return printToken(GOTO); }
-"static"                                                                           { return printToken(STATIC); }
-"while"                                                                            { return printToken(WHILE); }
-"sizeof"                                                                           { return printToken(SIZEOF); }
-"union"                                                                            { return printToken(UNION); }
-"register"                                                                         { return printToken(REGISTER); }
-"switch"                                                                           { return printToken(SWITCH); }
-"typedef"                                                                          { return printToken(TYPEDEF); }
-"struct"                                                                           { return printToken(STRUCT); }
-"volatile"                                                                         { return printToken(VOLATILE); }
-^"#include"[ ]*<.+\.h>                                                             { return printToken(INCLUDE); }
-"#define"                                                                          { return printToken(DEFINE); }
-"true"                                                                             { return printToken(TRUE); }
-"false"                                                                            { return printToken(FALSE); }
-"main"                                                                             { return printToken(MAIN); }
-(_|{letter})({letter}|{digit}|_)*                                                  { return printToken(ID); }
-[-]?{digit}+                                                                       { return printToken(NUMBER); }
-{unary}                                                                            { return printToken(UNARY); }
-"<="                                                                               { return printToken(LE); }
-">="                                                                               { return printToken(GE); }
-"=="                                                                               { return printToken(EQ); }
-"!="                                                                               { return printToken(NE); }
-">"                                                                                { return printToken(GT); }
-"<"                                                                                { return printToken(LT); }
-"&&"                                                                               { return printToken(AND); }
-"||"                                                                               { return printToken(OR); }
-"&"                                                                                { return printToken(BITAND); }
-"|"                                                                                { return printToken(BITOR); }
-"+"                                                                                { return printToken(ADD); }
-"-"                                                                                { return printToken(SUBTRACT); }
-"/"                                                                                { return printToken(DIVIDE); }
-"*"                                                                                { return printToken(MULTIPLY); }
-[-]?{digit}+\.{digit}{1,9}                                                         { return printToken(FLOAT_NUM); }
+"printf"                                                                           { yytokno += 1; return printToken(PRINTF); }
+"scanf"                                                                            { yytokno += 1; return printToken(SCANF); }
+"char"|"signed char"                                                               { yytokno += 1; return printToken(CHAR8); }
+"unsigned char"                                                                    { yytokno += 1; return printToken(UCHAR8); }
+"int"|"signed int"|"signed"|"short"|"short int"|"signed short"|"signed short int"  { yytokno += 1; return printToken(INT16); }
+"unsigned"|"unsigned int"|"unsigned short"|"unsigned short int"                    { yytokno += 1; return printToken(UINT16); }
+"long int"|"signed long int"|"long"|"signed long"                                  { yytokno += 1; return printToken(INT32); }
+"unsigned long"|"unsigned long int"                                                { yytokno += 1; return printToken(UINT32); }
+"long long"|"signed long long"|"long long int"|"signed long long int"              { yytokno += 1; return printToken(INT64); }
+"unsigned long long"|"unsigned long long int"                                      { yytokno += 1; return printToken(UINT64); }
+"FILE"                                                                             { yytokno += 1; return printToken(FILEP); }
+"float"                                                                            { yytokno += 1; return printToken(FLOAT32); }
+"double"                                                                           { yytokno += 1; return printToken(FLOAT64); }
+"long double"                                                                      { yytokno += 1; return printToken(FLOAT128); }
+"bool"                                                                             { yytokno += 1; return printToken(BOOL); }
+"void"                                                                             { yytokno += 1; return printToken(VOID); }
+"return"                                                                           { yytokno += 1; return printToken(RETURN); }
+"for"                                                                              { yytokno += 1; return printToken(FOR); }
+"if"                                                                               { yytokno += 1; return printToken(IF); }
+"else"                                                                             { yytokno += 1; return printToken(ELSE); }
+"break"                                                                            { yytokno += 1; return printToken(BREAK); }
+"case"                                                                             { yytokno += 1; return printToken(CASE); }
+"const"                                                                            { yytokno += 1; return printToken(CONST); }
+"continue"                                                                         { yytokno += 1; return printToken(CONTINUE); }
+"default"                                                                          { yytokno += 1; return printToken(DEFAULT); }
+"do"                                                                               { yytokno += 1; return printToken(DO); }
+"enum"                                                                             { yytokno += 1; return printToken(ENUM); }
+"extern"                                                                           { yytokno += 1; return printToken(EXTERN); }
+"goto"                                                                             { yytokno += 1; return printToken(GOTO); }
+"static"                                                                           { yytokno += 1; return printToken(STATIC); }
+"while"                                                                            { yytokno += 1; return printToken(WHILE); }
+"sizeof"                                                                           { yytokno += 1; return printToken(SIZEOF); }
+"union"                                                                            { yytokno += 1; return printToken(UNION); }
+"register"                                                                         { yytokno += 1; return printToken(REGISTER); }
+"switch"                                                                           { yytokno += 1; return printToken(SWITCH); }
+"typedef"                                                                          { yytokno += 1; return printToken(TYPEDEF); }
+"struct"                                                                           { yytokno += 1; return printToken(STRUCT); }
+"volatile"                                                                         { yytokno += 1; return printToken(VOLATILE); }
+^"#include"[ ]*<.+\.h>                                                             { yytokno += 1; return printToken(INCLUDE); }
+"#define"                                                                          { yytokno += 1; return printToken(DEFINE); }
+"true"                                                                             { yytokno += 1; return printToken(TRUE); }
+"false"                                                                            { yytokno += 1; return printToken(FALSE); }
+"main"                                                                             { yytokno += 1; return printToken(MAIN); }
+(_|{letter})({letter}|{digit}|_)*                                                  { yytokno += 1; return printToken(ID); }
+[-]?{digit}+                                                                       { yytokno += 1; return printToken(NUMBER); }
+{unary}                                                                            { yytokno += 1; return printToken(UNARY); }
+"<="                                                                               { yytokno += 1; return printToken(LE); }
+">="                                                                               { yytokno += 1; return printToken(GE); }
+"=="                                                                               { yytokno += 1; return printToken(EQ); }
+"!="                                                                               { yytokno += 1; return printToken(NE); }
+">"                                                                                { yytokno += 1; return printToken(GT); }
+"<"                                                                                { yytokno += 1; return printToken(LT); }
+"&&"                                                                               { yytokno += 1; return printToken(AND); }
+"||"                                                                               { yytokno += 1; return printToken(OR); }
+"&"                                                                                { yytokno += 1; return printToken(BITAND); }
+"|"                                                                                { yytokno += 1; return printToken(BITOR); }
+"+"                                                                                { yytokno += 1; return printToken(ADD); }
+"-"                                                                                { yytokno += 1; return printToken(SUBTRACT); }
+"/"                                                                                { yytokno += 1; return printToken(DIVIDE); }
+"*"                                                                                { yytokno += 1; return printToken(MULTIPLY); }
+[-]?{digit}+\.{digit}{1,9}                                                         { yytokno += 1; return printToken(FLOAT_NUM); }
 \/\/.*                                                                             { ; }
 \/\*(.*\n)*.*\*\/                                                                  { ; }
-[ \t]                                                                              { yycolno += 4; }
-[ \b]                                                                              { yycolno -= 1; }
-[ \n]                                                                              { yycolno = 1; }
-["].*["]                                                                           { return printToken(STR); }
-['].[']                                                                            { return printToken(CHARACTER); }
-"("                                                                                { return printToken(LPAR); }
-")"                                                                                { return printToken(RPAR); }
-"{"                                                                                { return printToken(LBRACK); }
-"}"                                                                                { return printToken(RBRACK); }
-"["                                                                                { return printToken(LBRACE); }
-"]"                                                                                { return printToken(RBRACE); }
-"="                                                                                { return printToken(ATTRIB); }
-";"                                                                                { return printToken(STMTEND); }
-","                                                                                { return printToken(COMMA); }
-.                                                                                  { return printf("Unrecognized token at line %d, column %d: '%s'\n", yylineno, yycolno, yytext); }
+[ \t]                                                                              { ; }
+[ \b]                                                                              { ; }
+[ \n]                                                                              { yytokno  = 0; }
+["].*["]                                                                           { yytokno += 1; return printToken(STR); }
+['].[']                                                                            { yytokno += 1; return printToken(CHARACTER); }
+"("                                                                                { yytokno += 1; return printToken(LPAR); }
+")"                                                                                { yytokno += 1; return printToken(RPAR); }
+"{"                                                                                { yytokno += 1; return printToken(LBRACK); }
+"}"                                                                                { yytokno += 1; return printToken(RBRACK); }
+"["                                                                                { yytokno += 1; return printToken(LBRACE); }
+"]"                                                                                { yytokno += 1; return printToken(RBRACE); }
+"="                                                                                { yytokno += 1; return printToken(ATTRIB); }
+";"                                                                                { yytokno += 1; return printToken(STMTEND); }
+","                                                                                { yytokno += 1; return printToken(COMMA); }
+.                                                                                  { return printf("Unrecognized token at line %d, token %d: '%s'\n", yylineno, yytokno, yytext); }
 
 %%
 

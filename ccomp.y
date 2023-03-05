@@ -1,11 +1,12 @@
 /* CComp C Parser */
+%define parse.error verbose
 
 %{
     #include <stdio.h>
     #include <stdlib.h>
     #include "lex.yy.c"
 
-    int errorcount = 0, yylineno, yycolno, symbolnum = 0, symbolposfound;
+    int errorcount = 0, yylineno, yytokno, symbolnum = 0, symbolposfound;
     char symboltype[24];
     char symbolspec[16];
 
@@ -530,7 +531,7 @@ int main()
 void yyerror(const char* msg)
 {
     errorcount++;
-    printf ("Parse error at line %d, column %d: %s\n", yylineno, yycolno, msg);
+    printf ("Parse error at line %d, token %d: %s\n", yylineno, yytokno, msg);
 }
 
 
